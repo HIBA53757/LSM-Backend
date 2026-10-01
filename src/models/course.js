@@ -7,38 +7,52 @@ const courseSchema = new mongoose.Schema(
             required: true,
             trim: true
         },
-        descreption: {
+
+        description: {
             type: String,
             required: true,
             trim: true
         },
+
         objectives: {
             type: [String],
             required: true
         },
+
         level: {
             type: String,
-            required:true,
-            enum:["beginner","intermediate ","advanced"]
+            required: true,
+            enum: ["beginner", "intermediate", "advanced"]
         },
-        category:{
+
+        category: {
             type: String,
             required: true,
-            trim
+            trim: true
         },
-        estimatedDuration:{
+
+        estimatedDuration: {
             type: Number,
             required: true,
-            min:1
+            min: 1
         },
+
+        publicationStatus: {
+            type: String,
+            required: true,
+            enum: ["draft", "published"]
+        },
+
         publishedAt: {
             type: Date,
             default: null
-        },
-    },  {
-            timestamps:true
         }
-)
+    },
+    {
+        timestamps: true
+    }
+);
 
-const Course = mongoose.model("Course", courseShema);
+const Course = mongoose.model("Course", courseSchema);
+
 export default Course;
