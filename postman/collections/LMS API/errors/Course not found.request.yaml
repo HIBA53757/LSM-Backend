@@ -1,0 +1,13 @@
+$kind: http-request
+description: |-
+  Tests the response when the course ID is valid but the course does not exist.
+
+  **Method:** GET  
+  **Endpoint:** `/api/courses/:id`
+
+  **Response:**
+
+  - `404` — Course not found
+url: ""
+method: GET
+order: 3630951008386193

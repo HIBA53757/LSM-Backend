@@ -1,0 +1,13 @@
+$kind: http-request
+description: |-
+  Tests the response when the requested route does not exist.
+
+  **Method:** GET  
+  **Endpoint:** `/api/test`
+
+  **Response:**
+
+  - `404` — Route not found
+url: http://localhost:3000/api/test
+method: GET
+order: 1790951769254

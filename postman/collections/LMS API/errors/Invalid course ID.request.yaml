@@ -1,0 +1,13 @@
+$kind: http-request
+description: |-
+  Tests the response when the course ID has an invalid format.
+
+  **Method:** GET  
+  **Endpoint:** `/api/courses/:id`
+
+  **Response:**
+
+  - `400` — Invalid course ID
+url: http://localhost:3000/api/courses/123
+method: GET
+order: 2947293308357298
