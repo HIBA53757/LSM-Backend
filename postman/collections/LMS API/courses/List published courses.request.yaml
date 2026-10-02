@@ -17,6 +17,6 @@ description: |-
 
   Response 500  
   Internal server error.
-url: ""
+url: http://localhost:3000/api/courses
 method: GET
 order: 1790939913974

@@ -1,0 +1,15 @@
+$kind: http-request
+description: |-
+  Returns all resources belonging to a specific module.
+
+  **Method:** GET  
+  **Endpoint:** `/api/modules/:moduleId/resources`
+
+  **Responses:**
+
+  - `200` — Resources returned successfully
+      
+  - `500` — Internal server error
+url: http://localhost:3000/api/modules/6abe82dbf7f292afd8acce17/resources
+method: GET
+order: 1790951011026

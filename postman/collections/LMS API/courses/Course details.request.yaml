@@ -14,6 +14,6 @@ description: |-
   - `404` — Course not found
       
   - `500` — Internal server error
-url: ""
+url: http://localhost:3000/api/courses/6abe82dbf7f292afd8acce14
 method: GET
 order: 2062440645543414
