@@ -12,9 +12,11 @@ export async function getCourses(req, res, next) {
         if (category) {
             filter.category = category;
         }
+
         if (level) {
             filter.level = level;
         }
+
         if (keyword) {
             filter.$or = [
                 { title: { $regex: keyword, $options: "i" } },
@@ -22,6 +24,7 @@ export async function getCourses(req, res, next) {
                 { category: { $regex: keyword, $options: "i" } }
             ];
         }
+
         const sortOptions = {
             createdAt: { createdAt: 1 },
             "-createdAt": { createdAt: -1 },
@@ -30,7 +33,8 @@ export async function getCourses(req, res, next) {
         };
 
         const sortOrder = sortOptions[sort] || { createdAt: -1 };
-        const courses = (await Course.find(filter)).toSorted(sortOrder);
+
+        const courses = await Course.find(filter).sort(sortOrder);
 
         res.status(200).json(courses);
     } catch (error) {
