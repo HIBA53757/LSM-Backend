@@ -1,0 +1,28 @@
+$kind: http-request
+description: |-
+  Returns all published courses sorted by creation or publication date.
+
+  **Method:** GET  
+  **Endpoint:** `/api/courses?sort=-createdAt`
+
+  **Sort options:**
+
+  - `createdAt` — oldest first
+      
+  - `-createdAt` — newest first
+      
+  - `publishedAt` — oldest publication first
+      
+  - `-publishedAt` — newest publication first
+      
+
+  **Responses:**
+
+  - **200** — Courses returned successfully
+      
+  - **500** — Internal server error
+url: " http://localhost:3000/api/courses?sort=-createdAt"
+method: GET
+queryParams:
+  sort: -createdAt
+order: 4498517255813758

@@ -3,7 +3,7 @@ import Course from "../models/course.js";
 
 export async function getCourses(req, res, next) {
     try {
-        const { category, level, keyword } = req.query;
+        const { category, level, keyword, sort } = req.query;
 
         const filter = {
             publicationStatus: "published"
@@ -22,7 +22,15 @@ export async function getCourses(req, res, next) {
                 { category: { $regex: keyword, $options: "i" } }
             ];
         }
-        const courses = await Course.find(filter);
+        const sortOptions = {
+            createdAt: { createdAt: 1 },
+            "-createdAt": { createdAt: -1 },
+            publishedAt: { publishedAt: 1 },
+            "-publishedAt": { publishedAt: -1 }
+        };
+
+        const sortOrder = sortOptions[sort] || { createdAt: -1 };
+        const courses = (await Course.find(filter)).toSorted(sortOrder);
 
         res.status(200).json(courses);
     } catch (error) {
