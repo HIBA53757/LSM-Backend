@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./config/database.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import moduleRoutes from "./routes/moduleRoutes.js";
-import notFound from "./middlewares/notFound.js";
+import {notFound} from "./middlewares/notFound.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
 dotenv.config();

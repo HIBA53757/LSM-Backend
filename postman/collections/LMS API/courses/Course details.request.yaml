@@ -1,0 +1,19 @@
+$kind: http-request
+description: |-
+  Returns the details of a specific published course by its ID.
+
+  **Method:** GET  
+  **Endpoint:** `/api/courses/:id`
+
+  **Responses:**
+
+  - `200` — Course found
+      
+  - `400` — Invalid course ID
+      
+  - `404` — Course not found
+      
+  - `500` — Internal server error
+url: ""
+method: GET
+order: 2062440645543414

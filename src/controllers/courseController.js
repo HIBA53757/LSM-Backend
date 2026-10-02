@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Course from "../models/course.js";
 
 export async function getCourses(req, res, next) {
@@ -14,6 +15,12 @@ export async function getCourses(req, res, next) {
 
 export async function getCourseById(req, res, next) {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                error: "Invalid course ID"
+            });
+        }
+
         const course = await Course.findOne({
             _id: req.params.id,
             publicationStatus: "published"

@@ -1,0 +1,22 @@
+$kind: http-request
+description: |-
+  Description  
+  Returns all published courses.
+
+  Method  
+  GET
+
+  Endpoint  
+  /api/courses
+
+  Query Parameters  
+  None
+
+  Response 200  
+  Returns an array of published courses.
+
+  Response 500  
+  Internal server error.
+url: ""
+method: GET
+order: 1790939913974

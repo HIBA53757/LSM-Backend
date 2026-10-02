@@ -1,0 +1,15 @@
+$kind: http-request
+description: |-
+  Returns all published modules belonging to a specific course.
+
+  **Method:** GET  
+  **Endpoint:** `/api/courses/:courseId/modules`
+
+  **Responses:**
+
+  - `200` — Modules returned successfully
+      
+  - `500` — Internal server error
+url: ""
+method: GET
+order: 2528798257390553
