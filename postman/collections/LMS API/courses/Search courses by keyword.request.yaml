@@ -1,0 +1,22 @@
+$kind: http-request
+description: |-
+  Returns all published courses matching a keyword in the title, description, or category.
+
+  **Method:** GET  
+  **Endpoint:** `/api/courses?keyword=JavaScript`
+
+  **Responses:**
+
+  - **200** — Courses returned successfully
+      
+  - **200** — Empty array if no course matches the keyword
+      
+  - **500** — Internal server error
+url: http://localhost:3000/api/courses?keyword=javascript
+method: GET
+queryParams:
+  - key: keyword
+    value: javascript
+    disabled: false
+    description: ""
+order: 4458934637599385

@@ -3,7 +3,7 @@ import Course from "../models/course.js";
 
 export async function getCourses(req, res, next) {
     try {
-        const { category, level } = req.query;
+        const { category, level, keyword } = req.query;
 
         const filter = {
             publicationStatus: "published"
@@ -14,6 +14,13 @@ export async function getCourses(req, res, next) {
         }
         if (level) {
             filter.level = level;
+        }
+        if (keyword) {
+            filter.$or = [
+                { title: { $regex: keyword, $options: "i" } },
+                { description: { $regex: keyword, $options: "i" } },
+                { category: { $regex: keyword, $options: "i" } }
+            ];
         }
         const courses = await Course.find(filter);
 
