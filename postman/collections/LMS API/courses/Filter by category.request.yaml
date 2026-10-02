@@ -1,0 +1,22 @@
+$kind: http-request
+description: |-
+  Returns all published courses belonging to a specific category.
+
+  **Method:** GET  
+  **Endpoint:** `/api/courses?category=JavaScript`
+
+  **Responses:**
+
+  - **200** — Courses returned successfully
+      
+  - **200** — Empty array if no course matches the category
+      
+  - **500** — Internal server error
+url: http://localhost:3000/api/courses?category=JavaScript
+method: GET
+queryParams:
+  - key: category
+    value: JavaScript
+    disabled: false
+    description: ""
+order: 4156352451275709

@@ -3,9 +3,19 @@ import Course from "../models/course.js";
 
 export async function getCourses(req, res, next) {
     try {
-        const courses = await Course.find({
+        const { category, level } = req.query;
+
+        const filter = {
             publicationStatus: "published"
-        });
+        };
+
+        if (category) {
+            filter.category = category;
+        }
+        if (level) {
+            filter.level = level;
+        }
+        const courses = await Course.find(filter);
 
         res.status(200).json(courses);
     } catch (error) {
