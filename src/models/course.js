@@ -37,16 +37,23 @@ const courseSchema = new mongoose.Schema(
             min: 1
         },
 
-        publicationStatus: {
+        Status: {
             type: String,
-            required: true,
-            enum: ["draft", "published"]
+            enum: ["draft", "published","archived"],
+            default:"draft"
         },
 
         publishedAt: {
             type: Date,
             default: null
+        },
+
+        trainer:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"User",
+            required: true
         }
+
     },
     {
         timestamps: true

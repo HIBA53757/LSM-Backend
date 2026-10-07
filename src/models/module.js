@@ -14,7 +14,7 @@ const moduleSchema = new mongoose.Schema(
             trim: true
         },
 
-        order: {
+        position: {
             type: Number,
             required: true,
             min: 1
