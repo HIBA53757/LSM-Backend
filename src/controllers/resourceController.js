@@ -6,7 +6,7 @@ export async function getResourcesByModule(req, res, next) {
             module: req.params.moduleId
         }).sort({ displayOrder: 1 });
 
-        res.status(200).json(resources);
+        res.status(200).json(resources)
     } catch (error) {
         next(error);
     }
