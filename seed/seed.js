@@ -30,7 +30,7 @@ async function seed() {
                 level: "beginner",
                 category: "JavaScript",
                 estimatedDuration: 20,
-                publicationStatus: "published",
+                Status: "published",
                 publishedAt: new Date()
             },
 
@@ -45,7 +45,7 @@ async function seed() {
                 level: "intermediate",
                 category: "Backend Development",
                 estimatedDuration: 30,
-                publicationStatus: "published",
+                Status: "published",
                 publishedAt: new Date()
             },
 
@@ -60,7 +60,7 @@ async function seed() {
                 level: "beginner",
                 category: "Database",
                 estimatedDuration: 15,
-                publicationStatus: "draft"
+                Status: "draft"
             }
         ]);
 
