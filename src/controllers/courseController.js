@@ -6,7 +6,7 @@ export async function getCourses(req, res, next) {
         const { category, level, keyword, sort } = req.query;
 
         const filter = {
-            Status: "published"
+            status: "published"
         };
 
         if (category) {
@@ -52,7 +52,7 @@ export async function getCourseById(req, res, next) {
 
         const course = await Course.findOne({
             _id: req.params.id,
-            Status: "published"
+            status: "published"
         });
 
         if (!course) {
