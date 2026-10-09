@@ -12,11 +12,8 @@ description: |-
   - **200** — Empty array if no course matches the keyword
       
   - **500** — Internal server error
-url: http://localhost:3000/api/courses?keyword=javascript
+url: "{{URL}}/api/courses?keyword=javascript"
 method: GET
 queryParams:
-  - key: keyword
-    value: javascript
-    disabled: false
-    description: ""
+  keyword: javascript
 order: 4458934637599385

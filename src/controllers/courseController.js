@@ -6,7 +6,7 @@ export async function getCourses(req, res, next) {
         const { category, level, keyword, sort } = req.query;
 
         const filter = {
-            Status: "published"
+            status: "published"
         };
 
         if (category) {
@@ -52,7 +52,7 @@ export async function getCourseById(req, res, next) {
 
         const course = await Course.findOne({
             _id: req.params.id,
-            Status: "published"
+            status: "published"
         });
 
         if (!course) {
@@ -64,5 +64,70 @@ export async function getCourseById(req, res, next) {
         res.status(200).json(course);
     } catch (error) {
         next(error);
+    }
+}
+
+export async function createCourse(req, res, next) {
+    try {
+        console.log("authenticated user", req.user);
+        const {
+            title,
+            description,
+            objectives,
+            level,
+            category,
+            estimatedDuration
+        } = req.body
+
+        const course = await Course.create({
+            title,
+            description,
+            objectives,
+            level,
+            category,
+            estimatedDuration,
+            trainer: req.user.id,
+            status: "draft"
+        });
+        res.status(201).json({
+            success: true,
+            message: "course created successfully",
+            course
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+export async function updateCourse(req, res, next) {
+    try {
+        const { title,
+            description,
+            objectives,
+            level,
+            category,
+            estimatedDuration
+        } = req.body
+        const course = req.course;
+
+        if (title !== undefined) {course.title = title};
+        if (description !== undefined) {course.description = description};
+        if (objectives !== undefined) course.objectives = objectives;
+        if (level !== undefined) course.level = level;
+        if (category !== undefined) course.category = category;
+        if (estimatedDuration !== undefined) {
+            course.estimatedDuration = estimatedDuration;
+        }
+
+          await course.save();
+          res.status(200).json({
+            success:true,
+            message:"Course updated successfully",
+            course
+          });
+
+    }
+    catch (error) {
+        next(error)
     }
 }

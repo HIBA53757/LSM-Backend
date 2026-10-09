@@ -12,11 +12,8 @@ description: |-
   - **200** — Empty array if no course matches the category
       
   - **500** — Internal server error
-url: http://localhost:3000/api/courses?category=JavaScript
+url: "{{URL}}/api/courses?category=JavaScript"
 method: GET
 queryParams:
-  - key: category
-    value: JavaScript
-    disabled: false
-    description: ""
+  category: JavaScript
 order: 4156352451275709
