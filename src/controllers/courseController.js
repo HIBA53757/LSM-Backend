@@ -67,17 +67,17 @@ export async function getCourseById(req, res, next) {
     }
 }
 
-export async function createCourse(req, res, next){
-    try{
-        console.log("authenticated user",req.user);
-        const{
+export async function createCourse(req, res, next) {
+    try {
+        console.log("authenticated user", req.user);
+        const {
             title,
             description,
             objectives,
             level,
             category,
             estimatedDuration
-        }= req.body
+        } = req.body
 
         const course = await Course.create({
             title,
@@ -87,7 +87,7 @@ export async function createCourse(req, res, next){
             category,
             estimatedDuration,
             trainer: req.user.id,
-            status:"draft"
+            status: "draft"
         });
         res.status(201).json({
             success: true,
@@ -95,7 +95,39 @@ export async function createCourse(req, res, next){
             course
         })
     }
-    catch(error){
+    catch (error) {
+        next(error)
+    }
+}
+export async function updateCourse(req, res, next) {
+    try {
+        const { title,
+            description,
+            objectives,
+            level,
+            category,
+            estimatedDuration
+        } = req.body
+        const course = req.course;
+
+        if (title !== undefined) {course.title = title};
+        if (description !== undefined) {course.description = description};
+        if (objectives !== undefined) course.objectives = objectives;
+        if (level !== undefined) course.level = level;
+        if (category !== undefined) course.category = category;
+        if (estimatedDuration !== undefined) {
+            course.estimatedDuration = estimatedDuration;
+        }
+
+          await course.save();
+          res.status(200).json({
+            success:true,
+            message:"Course updated successfully",
+            course
+          });
+
+    }
+    catch (error) {
         next(error)
     }
 }
