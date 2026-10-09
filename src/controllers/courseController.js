@@ -66,3 +66,36 @@ export async function getCourseById(req, res, next) {
         next(error);
     }
 }
+
+export async function createCourse(req, res, next){
+    try{
+        console.log("authenticated user",req.user);
+        const{
+            title,
+            description,
+            objectives,
+            level,
+            category,
+            estimatedDuration
+        }= req.body
+
+        const course = await Course.create({
+            title,
+            description,
+            objectives,
+            level,
+            category,
+            estimatedDuration,
+            trainer: req.user.id,
+            status:"draft"
+        });
+        res.status(201).json({
+            success: true,
+            message: "course created successfully",
+            course
+        })
+    }
+    catch(error){
+        next(error)
+    }
+}

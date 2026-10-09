@@ -1,0 +1,47 @@
+$kind: http-request
+description: |-
+  Description  
+  create a course.
+
+  Method  
+  POST
+
+  Endpoint  
+  /api/courses
+
+  Query Parameters  
+  None
+
+  Response 200  
+  Returns an array of created course.
+
+  Response 500  
+  Internal server error.
+url: "{{URL}}/api/courses"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"title\": \"Laravel Fundamentals\",\r
+
+    \    \"description\": \"Learn the fundamentals of Laravel.\",\r
+
+    \    \"objectives\": [\r
+
+    \        \"Understand Laravel basics\",\r
+
+    \        \"Create Laravel routes\",\r
+
+    \        \"Work with controllers\"\r
+
+    \    ],\r
+
+    \    \"level\": \"beginner\",\r
+
+    \    \"category\": \"Laravel\",\r
+
+    \    \"estimatedDuration\": 20\r
+
+    }"
+order: 4500908661133622

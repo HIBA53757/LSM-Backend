@@ -10,6 +10,6 @@ description: |-
   - `200` — Modules returned successfully
       
   - `500` — Internal server error
-url: http://localhost:3000/api/courses/6abe82dbf7f292afd8acce14/modules
+url: "{{URL}}/courses/6abe82dbf7f292afd8acce14/modules"
 method: GET
 order: 2528798257390553
