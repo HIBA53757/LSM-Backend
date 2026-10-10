@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{URL}}/api/courses/6ac916d3ff956d9d1f7f1d20/archived"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_19p9}}"
+order: 4503126436180417
