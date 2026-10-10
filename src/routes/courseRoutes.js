@@ -1,5 +1,5 @@
 import express from "express";
-import { getCourses , getCourseById , createCourse, updateCourse, publishCourse } from "../controllers/courseController.js";
+import { getCourses , getCourseById , createCourse, updateCourse, publishCourse, unpublishCourse } from "../controllers/courseController.js";
 import { getModulesByCourse } from "../controllers/moduleController.js";
 import { authenticate, authorize } from "../middlewares/Auth.js";
 import {ownCourse} from "../middlewares/ownCourse.js";
@@ -16,6 +16,8 @@ router.post("/",authenticate, authorize("admin","trainer"), createCourse);
 
 router.patch("/:id",authenticate,authorize("trainer", "admin"),ownCourse, updateCourse);
 
-router.patch("/:id/publish",authenticate, authorize("admin","trainer"),ownCourse, publishCourse)
+router.patch("/:id/publish",authenticate, authorize("admin","trainer"),ownCourse, publishCourse);
+
+router.patch("/:id/unpublish",authenticate ,authorize("admin","trainer"),ownCourse , unpublishCourse)
 
 export default router;

@@ -1,4 +1,4 @@
 $kind: http-request
-url: ""
-method: GET
+url: "{{URL}}/api/"
+method: PATCH
 order: 4502610375010008

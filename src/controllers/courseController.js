@@ -151,3 +151,23 @@ export async function publishCourse(req,res,nex){
         next(error)
     }
 }
+
+
+export async function unpublishCourse(req, res, next) {
+    try {
+        const course = req.course;
+
+        course.status = "draft";
+        course.publishedAt = null;
+
+        await course.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Course unpublished successfully",
+            course
+        });
+    } catch (error) {
+        next(error);
+    }
+}
