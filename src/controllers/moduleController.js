@@ -42,3 +42,42 @@ export async function createModule(req, res, next) {
         next(error);
     }
 }
+
+export async function updateModule(req, res, next) {
+    try {
+        const { title, description, position, estimatedDuration } = req.body;
+
+        const module = await Module.findById(req.params.moduleId);
+
+        if (!module) {
+            return res.status(404).json({
+                success: false,
+                message: "Module not found"
+            });
+        }
+
+        if (module.course.toString() !== req.course._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "This module does not belong to this course"
+            });
+        }
+
+        if (title !== undefined) module.title = title;
+        if (description !== undefined) module.description = description;
+        if (position !== undefined) module.position = position;
+        if (estimatedDuration !== undefined) {
+            module.estimatedDuration = estimatedDuration;
+        }
+
+        await module.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Module updated successfully",
+            module
+        });
+    } catch (error) {
+        next(error);
+    }
+}
