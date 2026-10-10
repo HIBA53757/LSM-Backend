@@ -111,8 +111,8 @@ export async function updateCourse(req, res, next) {
         } = req.body
         const course = req.course;
 
-        if (title !== undefined) {course.title = title};
-        if (description !== undefined) {course.description = description};
+        if (title !== undefined) { course.title = title };
+        if (description !== undefined) { course.description = description };
         if (objectives !== undefined) course.objectives = objectives;
         if (level !== undefined) course.level = level;
         if (category !== undefined) course.category = category;
@@ -120,12 +120,12 @@ export async function updateCourse(req, res, next) {
             course.estimatedDuration = estimatedDuration;
         }
 
-          await course.save();
-          res.status(200).json({
-            success:true,
-            message:"Course updated successfully",
+        await course.save();
+        res.status(200).json({
+            success: true,
+            message: "Course updated successfully",
             course
-          });
+        });
 
     }
     catch (error) {
@@ -133,8 +133,8 @@ export async function updateCourse(req, res, next) {
     }
 }
 
-export async function publishCourse(req,res,nex){
-    try{
+export async function publishCourse(req, res, nex) {
+    try {
         const course = req.course;
         course.status = "published";
         course.publishedAt = new Date();
@@ -142,16 +142,15 @@ export async function publishCourse(req,res,nex){
         await course.save();
 
         res.status(200).json({
-            success:true,
-            message:"Course published successfully",
+            success: true,
+            message: "Course published successfully",
             course
         })
     }
-    catch(error){
+    catch (error) {
         next(error)
     }
 }
-
 
 export async function unpublishCourse(req, res, next) {
     try {
@@ -169,5 +168,25 @@ export async function unpublishCourse(req, res, next) {
         });
     } catch (error) {
         next(error);
+    }
+}
+
+export async function archivedCourse(req, res, next) {
+    try {
+        const course = req.course;
+
+        course.status = "archived";
+        course.publishedAt = null;
+
+        await course.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Course archived successfully",
+            course
+        });
+    }
+    catch (error) {
+        next(error)
     }
 }
