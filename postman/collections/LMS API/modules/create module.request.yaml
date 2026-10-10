@@ -1,4 +1,21 @@
 $kind: http-request
-url: ""
-method: GET
+url: "{{URL}}/api/modules/courses/6ac916d3ff956d9d1f7f1d20/modules"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"title\":\"module test\",\r
+
+    \    \"description\":\"test\",\r
+
+    \    \"position\":\"1\",\r
+
+    \    \"estimatedDuration\": \"20\"\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_04c0}}"
 order: 2431782621644464
