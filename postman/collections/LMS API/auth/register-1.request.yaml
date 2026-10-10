@@ -1,0 +1,5 @@
+$kind: http-request
+name: register
+url: "{{URL}}/api/auth/register"
+method: POST
+order: 1781926817004

@@ -14,11 +14,14 @@ export async function ownCourse(req, res, next) {
             req.course = course;
             return next();
         }
-        if (course.trainer.toString() !== req.user.id) {
+        console.log("Logged-in user ID:", req.user.id);
+        console.log("Course trainer ID:", course.trainer);
+        console.log("User role:", req.user.role);
+        if (course.trainer.toString() !== req.user.id.toString()) {
             return res.status(403).json({
                 success: false,
                 message: "You are not allowed to modify this course"
-            })
+            });
         }
         req.course = course;
         next();

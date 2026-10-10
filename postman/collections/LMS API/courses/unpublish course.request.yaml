@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{URL}}/api/course/6ac916d3ff956d9d1f7f1d20/unpublish"
+method: PATCH
+order: 4503113856770263
