@@ -1,4 +1,11 @@
 $kind: http-request
-url: ""
-method: GET
+url: "{{URL}}/api/modules/6ac916d3ff956d9d1f7f1d20/6acabdc0795bf43a929b7b8e/modules"
+method: PATCH
+body:
+  type: json
+  content: "{\r\n    \"title\":\"updated\"\r\n}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_04c0}}"
 order: 3528453564743815

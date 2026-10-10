@@ -14,7 +14,6 @@ export async function getModulesByCourse(req, res, next) {
         next(error);
     }
 }
-
 export async function createModule(req, res, next) {
     try {
         const {
@@ -42,7 +41,6 @@ export async function createModule(req, res, next) {
         next(error);
     }
 }
-
 export async function updateModule(req, res, next) {
     try {
         const { title, description, position, estimatedDuration } = req.body;
@@ -75,6 +73,37 @@ export async function updateModule(req, res, next) {
         res.status(200).json({
             success: true,
             message: "Module updated successfully",
+            module
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+export async function publishModule(req, res, next) {
+    try {
+        const module = await Module.findById(req.params.moduleId);
+
+        if (!module) {
+            return res.status(404).json({
+                success: false,
+                message: "Module not found"
+            });
+        }
+
+        if (module.course.toString() !== req.course._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "This module does not belong to this course"
+            });
+        }
+
+        module.status = "published";
+
+        await module.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Module published successfully",
             module
         });
     } catch (error) {
