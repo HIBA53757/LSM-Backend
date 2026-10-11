@@ -110,3 +110,34 @@ export async function publishModule(req, res, next) {
         next(error);
     }
 }
+export async function unpublishModule(req, res, next) {
+    try {
+        const module = await Module.findById(req.params.moduleId);
+
+        if (!module) {
+            return res.status(404).json({
+                success: false,
+                message: "Module not found"
+            });
+        }
+
+        if (module.course.toString() !== req.course._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "This module does not belong to this course"
+            });
+        }
+
+        module.status = "draft";
+
+        await module.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Module unpublished successfully",
+            module
+        });
+    } catch (error) {
+        next(error);
+    }
+}
