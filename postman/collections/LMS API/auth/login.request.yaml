@@ -1,4 +1,4 @@
 $kind: http-request
-url: ""
+url: "{{URL}}/api/auth/login"
 method: POST
 order: 1791558054917
