@@ -2,15 +2,6 @@ import User from "../models/User.js";
 import { hash, compare } from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// Check if email and password exist
-function checkFields(email, password) {
-  if (!email || !password) {
-    return false;
-  }
-
-  return true;
-}
-
 // Hash the password
 async function hashPassword(password) {
   const hashedPassword = await hash(password, 10);
@@ -37,6 +28,7 @@ function createToken(user) {
 // Return user information
 function getUserInfo(user) {
   return {
+    name: user.name,
     id: user._id,
     email: user.email,
     role: user.role,
@@ -46,12 +38,12 @@ function getUserInfo(user) {
 // POST /api/auth/register
 export async function register(req, res) {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body || {};
 
     // Check fields
-    if (!checkFields(email, password)) {
+    if (!name || !email || !password) {
       return res.status(400).json({
-        message: "Email and password are required.",
+        message: "Name, email and password are required.",
       });
     }
 
@@ -69,6 +61,7 @@ export async function register(req, res) {
 
     // Create user
     const newUser = await User.create({
+      name,
       email,
       password: hashedPassword,
       role: "learner",
@@ -93,12 +86,11 @@ export async function login(req, res) {
     const { email, password } = req.body;
 
     // Check fields
-    if (!checkFields(email, password)) {
+    if (!email || !password) {
       return res.status(400).json({
-        message: "Email and password are required.",
+        message: "Name, email and password are required.",
       });
     }
-
     // Find user
     const user = await User.findOne({ email });
 
