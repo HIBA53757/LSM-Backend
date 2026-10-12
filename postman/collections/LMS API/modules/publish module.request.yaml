@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{URL}}/api/modules/courses/6ac916d3ff956d9d1f7f1d20/modules/6acabdc0795bf43a929b7b8e/publish"
+method: PATCH
+order: 4312720341191747
