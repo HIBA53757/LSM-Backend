@@ -1,4 +1,4 @@
 $kind: http-request
 url: ""
-method: GET
+method: POST
 order: 1000

@@ -23,7 +23,8 @@ export async function createResource(req, res, next) {
 
         res.status(201).json({
             success:true,
-            message:"re"
+            message:"Resource created successfully",
+            resource
         })
     }
     catch (error) {

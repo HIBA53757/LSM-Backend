@@ -1,0 +1,11 @@
+import express from "express";
+import { authenticate, authorize } from "../middlewares/Auth.js";
+import { ownModule } from "../middlewares/ownModule.js";
+import { createResource } from "../controllers/resourceController.js";
+import { ownCourse } from "../middlewares/ownCourse.js";
+
+
+const router = express.Router();
+router.post("/courses/:courseId/modules/:moduleId/resources",authenticate ,authorize("admin","trainer"),ownCourse , ownModule , createResource)
+
+export default router;

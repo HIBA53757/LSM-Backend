@@ -17,6 +17,9 @@ export async function ownModule(req, res, next) {
             });
         }
         req.module = module;
+        next();
 
-    } catch (error) { }
+    } catch (error) {
+        next(error)
+     }
 }
