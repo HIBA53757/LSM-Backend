@@ -1,6 +1,4 @@
 import Module from "../models/module.js";
-import Course from "../models/course.js";
-
 
 export async function getModulesByCourse(req, res, next) {
     try {

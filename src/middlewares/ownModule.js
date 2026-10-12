@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Module from "../models/module";
+import Module from "../models/module.js";
 
 export async function ownModule(req, res, next) {
     try {

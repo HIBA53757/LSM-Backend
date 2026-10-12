@@ -11,3 +11,22 @@ export async function getResourcesByModule(req, res, next) {
         next(error);
     }
 }
+
+export async function createResource(req, res, next) {
+    try {
+        const { title, type, content, url, descreption, position } = req.body
+        const resource = await Resource.create({
+            title, type, content, url, descreption, position,
+            module: req.module._id,
+            status:"draft"
+        })
+
+        res.status(201).json({
+            success:true,
+            message:"re"
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
