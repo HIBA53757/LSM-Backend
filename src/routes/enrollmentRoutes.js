@@ -3,7 +3,7 @@ import {
   enrollCourse,
   getMyEnrollments,
 } from "../controllers/enrollmentController.js";
-import { authenticate, authorize } from "../middlewares/auth.js";
+import { authenticate, authorize } from "../middlewares/Auth.js";
 
 const router = express.Router();
 
