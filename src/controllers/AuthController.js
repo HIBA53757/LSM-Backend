@@ -46,12 +46,12 @@ function getUserInfo(user) {
 // POST /api/auth/register
 export async function register(req, res) {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
     // Check fields
-    if (!checkFields(email, password)) {
+    if (!checkFields(name, email, password)) {
       return res.status(400).json({
-        message: "Email and password are required.",
+        message: "Email and password and names are required.",
       });
     }
 
@@ -69,6 +69,7 @@ export async function register(req, res) {
 
     // Create user
     const newUser = await User.create({
+      name,
       email,
       password: hashedPassword,
       role: "learner",
