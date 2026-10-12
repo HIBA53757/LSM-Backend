@@ -5,7 +5,7 @@ import Course from "../models/course.js";
 export const enrollCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const learnerId = req.user._id;
+    const learnerId = req.user.id;
 
     // 1. Verify course exists and is published
     const course = await Course.findById(courseId);
@@ -56,7 +56,7 @@ export const enrollCourse = async (req, res) => {
 // GET /api/learners/me/enrollments
 export const getMyEnrollments = async (req, res) => {
   try {
-    const enrollments = await Enrollment.find({ learner: req.user._id })
+    const enrollments = await Enrollment.find({ learner: req.user.id })
       .populate("course", "title description status")
       .sort({ createdAt: -1 });
 
