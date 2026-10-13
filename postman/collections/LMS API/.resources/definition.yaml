@@ -39,3 +39,6 @@ variables:
         type: cloud
         secretId: c90947d3-4c84-43c3-b99d-4e269443ef6a
         vaultId: 8a943c71-ce8f-49a5-af4c-ac5bb7b00fcc
+  - key: json_web_token_14i3
+    secret: true
+    disabled: false
