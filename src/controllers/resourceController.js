@@ -55,3 +55,19 @@ export async function updateResource(req, res, next) {
         next(error)
     }
 }
+export async function publishResource(req,res,next){
+    try{
+         const resource = req.resource
+          resource.status = "published"
+          await resource.save()
+          res.status(200).json({
+            success:true,
+            message:"resource has been published",
+            resource
+          })
+         
+    }
+    catch(error){
+        next(error)
+    }
+}
