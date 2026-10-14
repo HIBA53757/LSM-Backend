@@ -1,6 +1,4 @@
 import Module from "../models/module.js";
-import Course from "../models/course.js";
-
 
 export async function getModulesByCourse(req, res, next) {
     try {
@@ -44,22 +42,7 @@ export async function createModule(req, res, next) {
 export async function updateModule(req, res, next) {
     try {
         const { title, description, position, estimatedDuration } = req.body;
-
-        const module = await Module.findById(req.params.moduleId);
-
-        if (!module) {
-            return res.status(404).json({
-                success: false,
-                message: "Module not found"
-            });
-        }
-
-        if (module.course.toString() !== req.course._id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: "This module does not belong to this course"
-            });
-        }
+        const module = req.module;
 
         if (title !== undefined) module.title = title;
         if (description !== undefined) module.description = description;
@@ -81,21 +64,7 @@ export async function updateModule(req, res, next) {
 }
 export async function publishModule(req, res, next) {
     try {
-        const module = await Module.findById(req.params.moduleId);
-
-        if (!module) {
-            return res.status(404).json({
-                success: false,
-                message: "Module not found"
-            });
-        }
-
-        if (module.course.toString() !== req.course._id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: "This module does not belong to this course"
-            });
-        }
+       const module = req.module;
 
         module.status = "published";
 
@@ -112,22 +81,7 @@ export async function publishModule(req, res, next) {
 }
 export async function unpublishModule(req, res, next) {
     try {
-        const module = await Module.findById(req.params.moduleId);
-
-        if (!module) {
-            return res.status(404).json({
-                success: false,
-                message: "Module not found"
-            });
-        }
-
-        if (module.course.toString() !== req.course._id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: "This module does not belong to this course"
-            });
-        }
-
+        const module = req.module;
         module.status = "draft";
 
         await module.save();
