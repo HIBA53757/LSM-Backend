@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{URL}}/api/progress/courses/6accf9c04d09195fd299379d/progress/start"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_14i3}}"
+order: 1000
