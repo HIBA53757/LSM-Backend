@@ -26,6 +26,9 @@ const enrollmentSchema = new mongoose.Schema(
 );
 
 // Prevent duplicate active enrollments for the same course and learner
-enrollmentSchema.index({ learner: 1, course: 1, status: 1 }, { unique: true });
+enrollmentSchema.index(
+  { learner: 1, course: 1 },
+  { unique: true, partialFilterExpression: { status: "active" } },
+);
 
 export default mongoose.model("Enrollment", enrollmentSchema);
