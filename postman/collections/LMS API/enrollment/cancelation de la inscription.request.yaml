@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{URL}}/api/enrollments/6accfb77d4afb7cda05e6dea/cancel"
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_14i3}}"
+order: 3000
