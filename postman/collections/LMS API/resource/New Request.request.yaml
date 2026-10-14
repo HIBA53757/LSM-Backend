@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{URL}}/api/resources/courses/"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"title\":\"test\",\r
+
+    \    \"type\":\"article\",\r
+
+    \    \"content\":\"test\",\r
+
+    \    \"url\":\"testttt\",\r
+
+    \    \"description\":\"testttttttt\",\r
+
+    \    \"position\":\"1\"\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_0t4i}}"
+order: 1791821685032
