@@ -1,4 +1,8 @@
 $kind: http-request
-url: ""
-method: GET
+url: "{{URL}}/api/courses/6accf9c04d09195fd299379d/enroll"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_14i3}}"
 order: 1000

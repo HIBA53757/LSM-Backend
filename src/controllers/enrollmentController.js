@@ -8,9 +8,15 @@ export const enrollCourse = async (req, res) => {
     const learnerId = req.user.id;
 
     // 1. Verify course exists and is published
+    // const course = await Course.findById(courseId);
+    // if (!course) {
+    //   return res.status(404).json({ message: "Course not found" });
+    // }
     const course = await Course.findById(courseId);
-    if (!course) {
-      return res.status(404).json({ message: "Course not found" });
+    if (!course || course.status !== "published") {
+      return res
+        .status(404)
+        .json({ message: "Course not found or not published" });
     }
 
     if (course.status !== "published") {
@@ -61,6 +67,35 @@ export const getMyEnrollments = async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.status(200).json({ enrollments });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// PATCH /api/enrollments/:id/cancel
+export const cancelEnrollment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const learnerId = req.user.id;
+
+    const enrollment = await Enrollment.findOne({
+      _id: id,
+      learner: learnerId,
+    });
+    if (!enrollment) {
+      return res.status(404).json({ message: "Enrollment not found" });
+    }
+
+    if (enrollment.status === "dropped") {
+      return res.status(400).json({ message: "Enrollment already cancelled" });
+    }
+
+    enrollment.status = "dropped";
+    await enrollment.save();
+
+    res
+      .status(200)
+      .json({ message: "Enrollment cancelled successfully", enrollment });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
