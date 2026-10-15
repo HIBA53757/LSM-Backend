@@ -8,7 +8,8 @@ import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import { notFound } from "./middlewares/notFound.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
-import { enrollCourse } from "./controllers/enrollmentController.js";
+import resourceRoutes from "./routes/resourceRoutes.js";
+
 dotenv.config();
 
 const app = express();
@@ -18,7 +19,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/modules", moduleRoutes);
-app.use("/api/", enrollmentRoutes);
+app.use("/api", enrollmentRoutes);
+app.use("/api/resources", resourceRoutes);
 app.use("/api/progress", progressionRoutes);
 const PORT = process.env.PORT || 3000;
 
