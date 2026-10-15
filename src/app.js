@@ -18,7 +18,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/modules", moduleRoutes);
-app.use("/api", enrollmentRoutes);
+app.use("/api/", enrollmentRoutes);
+app.use("/api/progress", progressionRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
