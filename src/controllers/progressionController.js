@@ -1,4 +1,4 @@
-import Progress from "../models/Progress.js";
+import Progress from "../models/progress.js";
 import Enrollment from "../models/Enrollment.js";
 import Module from "../models/module.js";
 import Resource from "../models/resource.js";
