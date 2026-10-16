@@ -176,3 +176,116 @@ export const completeModule = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+// GET /api/courses/:courseId/progression
+export const getCourseProgression = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const learnerId = req.user.id;
+
+    // 1. Récupérer le document de progression
+    const progress = await Progress.findOne({
+      learner: learnerId,
+      course: courseId,
+    });
+
+    if (!progress) {
+      return res
+        .status(404)
+        .json({ message: "Progress not found. Please start the course first" });
+    }
+
+    // 2. Récupérer tous les modules triés par ordre
+    const allModules = await Module.find({ course: courseId }).sort({
+      orderIndex: 1,
+    });
+
+    // 3. Tableau vide qu'on va remplir pas à pas
+    const modulesWithStatus = [];
+
+    // Boucle standard débutant : on traite chaque module l'un après l'autre
+    for (let i = 0; i < allModules.length; i++) {
+      const currentModule = allModules[i];
+      let status = "locked";
+
+      // Vérification 1 : Est-ce que ce module est déjà terminé ?
+      let isDone = false;
+      for (let m = 0; m < progress.completedModules.length; m++) {
+        if (
+          progress.completedModules[m].toString() ===
+          currentModule.id.toString()
+        ) {
+          isDone = true;
+          break;
+        }
+      }
+
+      if (isDone) {
+        status = "done";
+      } else {
+        // Vérification 2 : Est-ce qu'on a le droit d'y accéder ?
+        let canAccess = false;
+
+        if (i === 0) {
+          // Le tout premier module est toujours accessible
+          canAccess = true;
+        } else {
+          // Pour les suivants, on regarde si le module d'avant (i - 1) est terminé
+          const previousModule = allModules[i - 1];
+          for (let m = 0; m < progress.completedModules.length; m++) {
+            if (
+              progress.completedModules[m].toString() ===
+              previousModule.id.toString()
+            ) {
+              canAccess = true;
+              break;
+            }
+          }
+        }
+
+        // Si le module n'est pas accessible, il reste 'locked'
+        if (canAccess) {
+          // Vérification 3 : A-t-il commencé à voir des ressources de ce module ?
+          const moduleResources = await Resource.find({
+            module: currentModule.id,
+          });
+          let hasViewedAnyResource = false;
+
+          for (let r = 0; r < moduleResources.length; r++) {
+            const resourceId = moduleResources[r].id.toString();
+            for (let c = 0; c < progress.completedResources.length; c++) {
+              if (progress.completedResources[c].toString() === resourceId) {
+                hasViewedAnyResource = true;
+                break;
+              }
+            }
+            if (hasViewedAnyResource) break;
+          }
+
+          if (hasViewedAnyResource) {
+            status = "in progress";
+          } else {
+            status = "accessible";
+          }
+        }
+      }
+
+      // On ajoute l'objet propre dans notre liste
+      modulesWithStatus.push({
+        id: currentModule.id,
+        title: currentModule.title,
+        orderIndex: currentModule.orderIndex,
+        status: status,
+      });
+    }
+
+    // 4. Réponse envoyée
+    res.status(200).json({
+      courseId: courseId,
+      percent: progress.percent,
+      completedResourcesCount: progress.completedResources.length,
+      modules: modulesWithStatus,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

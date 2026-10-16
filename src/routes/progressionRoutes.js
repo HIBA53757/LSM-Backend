@@ -3,6 +3,7 @@ import {
   startOrResumeCourse,
   markResourceViewed,
   completeModule,
+  getCourseProgression,
 } from "../controllers/progressionController.js";
 import { authenticate, authorize } from "../middlewares/Auth.js";
 
@@ -29,4 +30,10 @@ router.post(
   completeModule,
 );
 
+router.get(
+  "/courses/:courseId/progression",
+  authenticate,
+  authorize("learner"),
+  getCourseProgression,
+);
 export default router;
