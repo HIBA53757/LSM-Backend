@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{URL}}/api/progress/resources/6acfaeb2452b1b1491e473b1/view"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_14i3}}"
+order: 2000
