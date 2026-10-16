@@ -7,5 +7,15 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  api:
+    build: .
+    container_name: lms-api
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.docker
+    depends_on:
+      - mongodb
 volumes:
   mongodb_data:
