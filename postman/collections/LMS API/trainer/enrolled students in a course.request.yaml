@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{URL}}/api/trainer/courses/6ac916d3ff956d9d1f7f1d20/learners"
+method: GET
+order: 2000
