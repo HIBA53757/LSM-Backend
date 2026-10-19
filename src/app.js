@@ -23,7 +23,6 @@ app.use("/api", enrollmentRoutes);
 app.use("/api/resources", resourceRoutes);
 app.use("/api/progress", progressionRoutes);
 app.use("/api/trainer",trainerRoutes)
-const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
   res.send("LMS API is running");
@@ -32,5 +31,4 @@ app.get("/", (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-// On exporte l'app pour que les tests puissent l'utiliser avec Supertest
 export default app;
