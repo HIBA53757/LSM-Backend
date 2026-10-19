@@ -9,13 +9,12 @@
 
 import request from "supertest";
 import mongoose from "mongoose";
+import { connectDB } from "../src/config/database.js";
 import app from "../src/app.js";
 
 // --- Connexion à MongoDB avant tous les tests ---
 beforeAll(async () => {
-  await mongoose.connect(
-    process.env.MONGO_URI || "mongodb://localhost:27017/lms",
-  );
+  await  connectDB()
 });
 
 // --- Variables partagées entre les tests ---
