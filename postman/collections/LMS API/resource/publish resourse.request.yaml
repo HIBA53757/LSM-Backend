@@ -1,5 +1,4 @@
 $kind: http-request
-name: New Request
 url: "{{URL}}/api/resources/6ac916d3ff956d9d1f7f1d20/6acabdc0795bf43a929b7b8e/6acd184540c168efaa088c1a/published"
 method: PATCH
 order: 1791821687032

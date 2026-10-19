@@ -14,9 +14,19 @@ export async function getResourcesByModule(req, res, next) {
 
 export async function createResource(req, res, next) {
     try {
-        const { title, type, content, url, descreption, position } = req.body
+        const { title, type, content, url, description, position } = req.body
+        const fileData = req.file
+            ? {
+                originalName: req.file.originalname,
+                filename: req.file.filename,
+                path: req.file.path,
+                size: req.file.size,
+                mimetype: req.file.mimetype
+            }
+            : undefined
+
         const resource = await Resource.create({
-            title, type, content, url, descreption, position,
+            title, type, content, url, description, position, file:fileData,
             module: req.module._id,
             status: "draft"
         })
@@ -55,19 +65,19 @@ export async function updateResource(req, res, next) {
         next(error)
     }
 }
-export async function publishResource(req,res,next){
-    try{
-         const resource = req.resource
-          resource.status = "published"
-          await resource.save()
-          res.status(200).json({
-            success:true,
-            message:"resource has been published",
+export async function publishResource(req, res, next) {
+    try {
+        const resource = req.resource
+        resource.status = "published"
+        await resource.save()
+        res.status(200).json({
+            success: true,
+            message: "resource has been published",
             resource
-          })
-         
+        })
+
     }
-    catch(error){
+    catch (error) {
         next(error)
     }
 }
