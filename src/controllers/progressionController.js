@@ -1,4 +1,4 @@
-import Progress from "../models/Progress.js";
+import Progress from "../models/progress.js";
 import Enrollment from "../models/Enrollment.js";
 import Module from "../models/module.js";
 import Resource from "../models/resource.js";
@@ -196,7 +196,7 @@ export const getCourseProgression = async (req, res) => {
 
     // 2. Récupérer tous les modules triés par ordre
     const allModules = await Module.find({ course: courseId }).sort({
-      orderIndex: 1,
+      position: 1,
     });
 
     // 3. Tableau vide qu'on va remplir pas à pas
@@ -273,7 +273,7 @@ export const getCourseProgression = async (req, res) => {
       modulesWithStatus.push({
         id: currentModule.id,
         title: currentModule.title,
-        orderIndex: currentModule.orderIndex,
+        position: currentModule.position,
         status: status,
       });
     }

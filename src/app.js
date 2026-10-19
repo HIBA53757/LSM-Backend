@@ -1,7 +1,6 @@
 import progressionRoutes from "./routes/progressionRoutes.js";
 import express from "express";
 import dotenv from "dotenv";
-import { connectDB } from "./config/database.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import moduleRoutes from "./routes/moduleRoutes.js";
 import enrollmentRoutes from "./routes/enrollmentRoutes.js";
@@ -32,8 +31,6 @@ app.get("/", (req, res) => {
 
 app.use(notFound);
 app.use(errorHandler);
-connectDB();
 
-app.listen(PORT, () => {
-  console.log(`server running on http://localhost:${PORT}`);
-});
+// On exporte l'app pour que les tests puissent l'utiliser avec Supertest
+export default app;
