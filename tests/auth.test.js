@@ -26,9 +26,9 @@ describe("Authentification", () => {
     });
 
     expect(res.statusCode).toBe(201);
-    expect(res.body.user.email).toBe(testEmail);
+    expect(res.body.data.user.email).toBe(testEmail);
 
-    userId = res.body.user.id;
+    userId = res.body.data.user.id;
   });
 
   test("Connexion réussie", async () => {

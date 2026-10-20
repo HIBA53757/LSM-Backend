@@ -25,7 +25,7 @@ beforeAll(async () => {
     email: testEmail,
     password: "MotDePasse123",
   });
-  userId = registerRes.body.user.id;
+  userId = registerRes.body.data.user.id;
 
   // 2. On se connecte pour récupérer le token
   const loginRes = await request(app).post("/api/auth/login").send({
@@ -57,9 +57,9 @@ describe("Inscription", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.statusCode).toBe(201);
-    expect(res.body.enrollment.status).toBe("active");
+    expect(res.body.data.enrollment.status).toBe("active");
 
-    enrollmentId = res.body.enrollment._id;
+    enrollmentId = res.body.data.enrollment._id;
   });
 });
 
@@ -70,7 +70,7 @@ describe("Progression", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body.progress.percent).toBe(0);
+    expect(res.body.data.progress.percent).toBe(0);
   });
 
   test("Consulter la progression", async () => {
@@ -79,8 +79,8 @@ describe("Progression", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty("percent");
-    expect(res.body).toHaveProperty("modules");
+    expect(res.body.data).toHaveProperty("percent");
+    expect(res.body.data).toHaveProperty("modules");
   });
 });
 
@@ -91,7 +91,7 @@ describe("Annulation", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body.enrollment.status).toBe("dropped");
+    expect(res.body.data.enrollment.status).toBe("dropped");
   });
 });
 
