@@ -7,7 +7,12 @@ export async function getModulesByCourse(req, res, next) {
             status: "published"
         }).sort({ position: 1 });
 
-        res.status(200).json(modules);
+        res.status(200).json({
+            success: true,
+            data: {
+                modules
+            }
+        });
     } catch (error) {
         next(error);
     }
@@ -33,7 +38,9 @@ export async function createModule(req, res, next) {
         res.status(201).json({
             success: true,
             message: "Module created successfully",
-            module
+            data: {
+                module
+            }
         });
     } catch (error) {
         next(error);
@@ -56,7 +63,9 @@ export async function updateModule(req, res, next) {
         res.status(200).json({
             success: true,
             message: "Module updated successfully",
-            module
+            data: {
+                module
+            }
         });
     } catch (error) {
         next(error);
@@ -73,7 +82,9 @@ export async function publishModule(req, res, next) {
         res.status(200).json({
             success: true,
             message: "Module published successfully",
-            module
+            data: {
+                module
+            }
         });
     } catch (error) {
         next(error);
@@ -89,7 +100,9 @@ export async function unpublishModule(req, res, next) {
         res.status(200).json({
             success: true,
             message: "Module unpublished successfully",
-            module
+            data: {
+                module
+            }
         });
     } catch (error) {
         next(error);

@@ -1,5 +1,9 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import {
+  ForbiddenError,
+  UnauthorizedError,
+} from "../utils/errors.js";
 
 export async function authenticate(req, res, next) {
   try {
@@ -8,10 +12,7 @@ export async function authenticate(req, res, next) {
 
     // 2. Check if the header exists and has "Bearer "
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        success: false,
-        message: "Access denied. No token provided.",
-      });
+      return next(new UnauthorizedError("Access denied. No token provided."));
     }
 
     // 3. Extract the token
@@ -24,18 +25,12 @@ export async function authenticate(req, res, next) {
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid token: user not found.",
-      });
+      return next(new UnauthorizedError("Invalid token: user not found."));
     }
 
     // 6. Check account status
     if (user.accountStatus !== "active") {
-      return res.status(403).json({
-        success: false,
-        message: "Account is suspended.",
-      });
+      return next(new ForbiddenError("Account is suspended."));
     }
 
     // 7. Put useful user information in req.user
@@ -47,20 +42,14 @@ export async function authenticate(req, res, next) {
     // 8. Continue to the next middleware
     next();
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired token.",
-    });
+    return next(new UnauthorizedError("Invalid or expired token."));
   }
 }
 
 export function authorize(...roles) {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: "Forbidden: Insufficient permissions.",
-      });
+      return next(new ForbiddenError());
     }
 
     next();

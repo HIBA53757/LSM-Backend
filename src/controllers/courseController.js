@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Course from "../models/course.js";
+import { NotFoundError, ValidationError } from "../utils/errors.js";
 
 export async function getCourses(req, res, next) {
     try {
@@ -36,7 +37,12 @@ export async function getCourses(req, res, next) {
 
         const courses = await Course.find(filter).sort(sortOrder);
 
-        res.status(200).json(courses);
+        res.status(200).json({
+            success : true,
+            data : {
+                courses
+            }
+        });
     } catch (error) {
         next(error);
     }
@@ -45,9 +51,7 @@ export async function getCourses(req, res, next) {
 export async function getCourseById(req, res, next) {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-            return res.status(400).json({
-                error: "Invalid course ID"
-            });
+            return next(new ValidationError("Invalid course ID"));
         }
 
         const course = await Course.findOne({
@@ -56,12 +60,15 @@ export async function getCourseById(req, res, next) {
         });
 
         if (!course) {
-            return res.status(404).json({
-                error: "Course not found"
-            });
+            return next(new NotFoundError("Course not found"));
         }
 
-        res.status(200).json(course);
+        res.status(200).json({
+            success: true,
+            data: {
+                course
+            }
+        });
     } catch (error) {
         next(error);
     }
@@ -92,7 +99,9 @@ export async function createCourse(req, res, next) {
         res.status(201).json({
             success: true,
             message: "course created successfully",
-            course
+            data: {
+                course
+            }
         })
     }
     catch (error) {
@@ -124,7 +133,9 @@ export async function updateCourse(req, res, next) {
         res.status(200).json({
             success: true,
             message: "Course updated successfully",
-            course
+            data: {
+                course
+            }
         });
 
     }
@@ -133,7 +144,7 @@ export async function updateCourse(req, res, next) {
     }
 }
 
-export async function publishCourse(req, res, nex) {
+export async function publishCourse(req, res, next) {
     try {
         const course = req.course;
         course.status = "published";
@@ -144,7 +155,9 @@ export async function publishCourse(req, res, nex) {
         res.status(200).json({
             success: true,
             message: "Course published successfully",
-            course
+            data: {
+                course
+            }
         })
     }
     catch (error) {
@@ -164,7 +177,9 @@ export async function unpublishCourse(req, res, next) {
         res.status(200).json({
             success: true,
             message: "Course unpublished successfully",
-            course
+            data: {
+                course
+            }
         });
     } catch (error) {
         next(error);
@@ -183,7 +198,9 @@ export async function archivedCourse(req, res, next) {
         res.status(200).json({
             success: true,
             message: "Course archived successfully",
-            course
+            data: {
+                course
+            }
         });
     }
     catch (error) {

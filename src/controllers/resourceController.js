@@ -6,7 +6,12 @@ export async function getResourcesByModule(req, res, next) {
             module: req.params.moduleId
         }).sort({ position: 1 });
 
-        res.status(200).json(resources)
+        res.status(200).json({
+            success: true,
+            data: {
+                resources
+            }
+        })
     } catch (error) {
         next(error);
     }
@@ -34,7 +39,9 @@ export async function createResource(req, res, next) {
         res.status(201).json({
             success: true,
             message: "Resource created successfully",
-            resource
+            data: {
+                resource
+            }
         })
     }
     catch (error) {
@@ -58,7 +65,9 @@ export async function updateResource(req, res, next) {
         res.status(200).json({
             success: true,
             message: "resource updated",
-            resource
+            data: {
+                resource
+            }
         })
     }
     catch (error) {
@@ -73,7 +82,9 @@ export async function publishResource(req, res, next) {
         res.status(200).json({
             success: true,
             message: "resource has been published",
-            resource
+            data: {
+                resource
+            }
         })
 
     }
