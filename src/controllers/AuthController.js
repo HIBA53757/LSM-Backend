@@ -72,7 +72,7 @@ export async function login(req, res, next) {
     }
 
     // Compare passwords
-    const isMatch = comparePassword(password, user.password)
+    const isMatch = await comparePassword(password, user.password)
 
     if (!isMatch) {
       return next(new ValidationError("Invalid credentials."));
