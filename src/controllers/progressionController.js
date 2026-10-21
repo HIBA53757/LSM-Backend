@@ -1,5 +1,4 @@
 import Progress from "../models/progress.js";
-import Enrollment from "../models/Enrollment.js";
 import Module from "../models/module.js";
 import Resource from "../models/resource.js";
 import {
@@ -8,76 +7,77 @@ import {
   NotFoundError,
 } from "../utils/errors.js";
 
-// POST /api/courses/:courseId/progress/start
-export const startOrResumeCourse = async (req, res, next) => {
-  try {
-    const { courseId } = req.params;
-    const learnerId = req.user.id;
+export async function getResourceById(req, res, next) {
+    try {
+        const { resource, module, course, enrollment} = req;
 
-    const enrollment = await Enrollment.findOne({
-      learner: learnerId,
-      course: courseId,
-      status: "active",
-    });
+        let progress = await Progress.findOne({ enrollment: enrollment.id });
 
-    if (!enrollment) {
-      return next(new ForbiddenError("Active enrollment required to start course"));
+        if (!progress) {
+          progress = await Progress.create({
+            enrollment: enrollment.id,
+            learner: req.user.id,
+            course: course.id,
+            completedResources: [],
+            completedModules: [],
+            percent: 0,
+          });
+        }
+
+        const modules = await Module.find({
+            course: course._id,
+            status: "published",
+        }).sort({ position: 1 });
+
+        const currentIndex = modules.findIndex(
+            (item) => item._id.toString() === module._id.toString(),
+        );
+
+        if (currentIndex > 0) {
+            const progress = await Progress.findOne({
+                learner: req.user.id,
+                course: course._id,
+            });
+            const previousModule = modules[currentIndex - 1];
+            const previousCompleted = progress?.completedModules.some(
+                (id) => id.toString() === previousModule._id.toString(),
+            );
+
+            if (!previousCompleted) {
+                return next(new ForbiddenError("Previous module must be completed first"));
+            }
+        }
+
+        res.status(200).json({
+            success: true,
+            data: { resource },
+        });
+    } catch (error) {
+        next(error);
     }
+}
 
-    let progress = await Progress.findOne({ enrollment: enrollment.id });
 
-    if (!progress) {
-      progress = await Progress.create({
-        enrollment: enrollment.id,
-        learner: learnerId,
-        course: courseId,
-        completedResources: [],
-        completedModules: [],
-        percent: 0,
-      });
-    }
-
-    res.status(200).json({ success: true, data: {progress} });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// POST /api/resources/:resourceId/view
 export const markResourceViewed = async (req, res, next) => {
   try {
-    const { resourceId } = req.params;
+    const { resource, module, course, enrollment} = req;
     const learnerId = req.user.id;
 
-    // 1. Vérifier si la ressource existe
-    const resource = await Resource.findById(resourceId);
-    if (!resource) {
-      return next(new NotFoundError("Resource not found"));
-    }
-
-    // 2. Trouver le module lié pour identifier le cours
-    const moduleDoc = await Module.findById(resource.module);
-    if (!moduleDoc) {
-      return next(new NotFoundError("Module not found for this resource"));
-    }
-
-    // 3. Récupérer le document de progression de l'apprenant
     const progress = await Progress.findOne({
       learner: learnerId,
-      course: moduleDoc.course,
+      course: course.id,
     });
 
     if (!progress) {
       return next(new BadRequestError("Please start the course before viewing resources"));
     }
 
-    // 4. Vérifier si la ressource est déjà marquée vue (éviter les doublons)
     const alreadyViewed = progress.completedResources.some(
-      (id) => id.toString() === resourceId.toString(),
+      (id) => id.toString() === resource.id.toString(),
     );
 
     if (!alreadyViewed) {
-      progress.completedResources.push(resourceId);
+      progress.completedResources.push(resource.id);
       await progress.save();
     }
 
@@ -91,24 +91,16 @@ export const markResourceViewed = async (req, res, next) => {
     next(error);
   }
 };
-// POST /api/modules/:moduleId/complete
+
+
 export const completeModule = async (req, res, next) => {
   try {
-    const { moduleId } = req.params;
+    const {module, course, enrollment} = req;
     const learnerId = req.user.id;
 
-    // 1. Récupérer le module demandé
-    const currentModule = await Module.findById(moduleId);
-    if (!currentModule) {
-      return next(new NotFoundError("Module not found"));
-    }
-
-    const courseId = currentModule.course;
-
-    // 2. Récupérer le document de progression de l'apprenant
     const progress = await Progress.findOne({
       learner: learnerId,
-      course: courseId,
+      course: course.id,
     });
 
     if (!progress) {
@@ -117,7 +109,7 @@ export const completeModule = async (req, res, next) => {
 
     // Si le module est déjà validé, pas besoin de refaire les calculs
     const isAlreadyDone = progress.completedModules.some(
-      (id) => id.toString() === moduleId.toString(),
+      (id) => id.toString() === module.id.toString(),
     );
     if (isAlreadyDone) {
       return res
@@ -132,11 +124,11 @@ export const completeModule = async (req, res, next) => {
     }
 
     // 3. Récupérer tous les modules du cours dans l'ordre
-    const allModules = await Module.find({ course: courseId }).sort({
+    const allModules = await Module.find({ course: course.id }).sort({
       position: 1,
     });
     const currentIndex = allModules.findIndex(
-      (m) => m.id.toString() === moduleId.toString(),
+      (m) => m.id.toString() === module.id.toString(),
     );
 
     // 4. VERROU SÉQUENTIEL : Si ce n'est pas le 1er module, le précédent doit être terminé
@@ -152,7 +144,7 @@ export const completeModule = async (req, res, next) => {
     }
 
     // 5. CONTRÔLE DES RESSOURCES : Toutes les ressources du module doivent être vues
-    const moduleResources = await Resource.find({ module: moduleId });
+    const moduleResources = await Resource.find({ module: module.id });
     const allResourcesDone = moduleResources.every((resource) =>
       progress.completedResources.some(
         (rId) => rId.toString() === resource.id.toString(),
@@ -164,7 +156,7 @@ export const completeModule = async (req, res, next) => {
     }
 
     // 6. Validation du module et calcul du pourcentage
-    progress.completedModules.push(moduleId);
+    progress.completedModules.push(module.id);
     progress.percent = Math.round(
       (progress.completedModules.length / allModules.length) * 100,
     );
@@ -182,7 +174,8 @@ export const completeModule = async (req, res, next) => {
     next(error);
   }
 };
-// GET /api/courses/:courseId/progression
+
+
 export const getCourseProgression = async (req, res, next) => {
   try {
     const { courseId } = req.params;

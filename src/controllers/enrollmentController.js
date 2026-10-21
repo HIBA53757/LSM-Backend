@@ -8,11 +8,6 @@ export const enrollCourse = async (req, res, next) => {
     const { courseId } = req.params;
     const learnerId = req.user.id;
 
-    // 1. Verify course exists and is published
-    // const course = await Course.findById(courseId);
-    // if (!course) {
-    //   return res.status(404).json({ message: "Course not found" });
-    // }
     const course = await Course.findById(courseId);
     if (!course || course.status !== "published") {
       return next(new NotFoundError("Course not found or not published"));
