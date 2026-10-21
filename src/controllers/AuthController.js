@@ -1,33 +1,6 @@
 import User from "../models/User.js";
-import { hash, compare } from "bcryptjs";
-import jwt from "jsonwebtoken";
-import {
-  ConflictError,
-  ValidationError,
-} from "../utils/errors.js";
-
-// Hash the password
-async function hashPassword(password) {
-  const hashedPassword = await hash(password, 10);
-
-  return hashedPassword;
-}
-
-// Create JWT token
-function createToken(user) {
-  const token = jwt.sign(
-    {
-      id: user._id,
-      role: user.role,
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "1d",
-    },
-  );
-
-  return token;
-}
+import { comparePassword, createToken, hashPassword } from "../utils/jwtHelper.js";
+import {ConflictError, ValidationError } from "../utils/errors.js";
 
 // Return user information
 function getUserInfo(user) {
@@ -90,14 +63,16 @@ export async function login(req, res, next) {
       return next(new ValidationError("Email and password are required."));
     }
     // Find user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('password');
+
+    console.log(user)
 
     if (!user) {
       return next(new ValidationError("Invalid credentials."));
     }
 
     // Compare passwords
-    const isMatch = await compare(password, user.password);
+    const isMatch = comparePassword(password, user.password)
 
     if (!isMatch) {
       return next(new ValidationError("Invalid credentials."));
