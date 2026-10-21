@@ -1,39 +1,45 @@
 import express from "express";
 import {
-  startOrResumeCourse,
   markResourceViewed,
   completeModule,
   getCourseProgression,
+  getResourceById,
 } from "../controllers/progressionController.js";
 import { authenticate, authorize } from "../middlewares/Auth.js";
+import { requireActiveEnrollment } from "../middlewares/activeEnrollment.js";
 
 const router = express.Router();
 
-router.post(
-  "/courses/:courseId/progress/start",
+router.get(
+  "/courses/:courseId/progression",
   authenticate,
   authorize("learner"),
-  startOrResumeCourse,
-);
-
-router.post(
-  "/resources/:resourceId/view",
-  authenticate,
-  authorize("learner"),
-  markResourceViewed,
+  requireActiveEnrollment("course", "courseId"),
+  getCourseProgression,
 );
 
 router.post(
   "/modules/:moduleId/complete",
   authenticate,
   authorize("learner"),
+  requireActiveEnrollment("module", "moduleId"),
   completeModule,
 );
 
 router.get(
-  "/courses/:courseId/progression",
+  "/resources/:resourceId",
   authenticate,
   authorize("learner"),
-  getCourseProgression,
+  requireActiveEnrollment("resource", "resourceId"),
+  getResourceById
 );
+
+router.post(
+  "/resources/:resourceId/view",
+  authenticate,
+  authorize("learner"),
+  requireActiveEnrollment("resource", "resourceId"),
+  markResourceViewed,
+);
+
 export default router;
