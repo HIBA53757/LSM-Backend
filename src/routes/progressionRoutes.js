@@ -11,7 +11,7 @@ import { requireActiveEnrollment } from "../middlewares/activeEnrollment.js";
 const router = express.Router();
 
 router.get(
-  "/courses/:courseId/progression",
+  "/courses/:courseId",
   authenticate,
   authorize("learner"),
   requireActiveEnrollment("course", "courseId"),
@@ -27,7 +27,7 @@ router.post(
 );
 
 router.get(
-  "/resources/:resourceId",
+  "/resources/:resourceId/view",
   authenticate,
   authorize("learner"),
   requireActiveEnrollment("resource", "resourceId"),
@@ -35,7 +35,7 @@ router.get(
 );
 
 router.post(
-  "/resources/:resourceId/view",
+  "/resources/:resourceId/complete",
   authenticate,
   authorize("learner"),
   requireActiveEnrollment("resource", "resourceId"),
