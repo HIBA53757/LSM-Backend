@@ -1,7 +1,12 @@
-export function errorHandler(err, req, res, next) {
-    console.error(err);
+import { AppError } from "../utils/errors.js";
 
-    res.status(500).json({
-        error: "Internal server error"
+function errorHandler(error, req, res, next) {
+    const normalizedError = AppError.from(error);
+    console.error(error);
+
+    return res.status(normalizedError.status).json({
+        success: false,
+        message: normalizedError.message,
     });
 }
+export default errorHandler

@@ -1,6 +1,10 @@
 import User from "../models/User.js";
 import { hash, compare } from "bcryptjs";
 import jwt from "jsonwebtoken";
+import {
+  ConflictError,
+  ValidationError,
+} from "../utils/errors.js";
 
 // Hash the password
 async function hashPassword(password) {
@@ -36,24 +40,20 @@ function getUserInfo(user) {
 }
 
 // POST /api/auth/register
-export async function register(req, res) {
+export async function register(req, res, next) {
   try {
     const { name, email, password } = req.body || {};
 
     // Check fields
     if (!name || !email || !password) {
-      return res.status(400).json({
-        message: "Name, email and password are required.",
-      });
+      return next(new ValidationError("Name, email and password are required."));
     }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({
-        message: "Email already registered.",
-      });
+      return next(new ConflictError("Email already registered."));
     }
 
     // Hash password
@@ -69,44 +69,38 @@ export async function register(req, res) {
 
     // Send response
     res.status(201).json({
+      success: true,
       message: "User registered successfully",
-      user: getUserInfo(newUser),
+      data: {
+        user: getUserInfo(newUser),
+      }
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 }
 
 // POST /api/auth/login
-export async function login(req, res) {
+export async function login(req, res, next) {
   try {
     const { email, password } = req.body;
 
     // Check fields
     if (!email || !password) {
-      return res.status(400).json({
-        message: "Name, email and password are required.",
-      });
+      return next(new ValidationError("Email and password are required."));
     }
     // Find user
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({
-        message: "Invalid credentials.",
-      });
+      return next(new ValidationError("Invalid credentials."));
     }
 
     // Compare passwords
     const isMatch = await compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({
-        message: "Invalid credentials.",
-      });
+      return next(new ValidationError("Invalid credentials."));
     }
 
     // Create token
@@ -114,14 +108,14 @@ export async function login(req, res) {
 
     // Send response
     res.status(200).json({
+      success: true,
       message: "Logged in successfully",
       token: token,
-      user: getUserInfo(user),
+      data: {
+        user: getUserInfo(user),
+      }
     });
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+    next(error);
   }
 }

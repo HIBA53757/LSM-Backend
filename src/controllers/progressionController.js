@@ -2,9 +2,14 @@ import Progress from "../models/progress.js";
 import Enrollment from "../models/Enrollment.js";
 import Module from "../models/module.js";
 import Resource from "../models/resource.js";
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "../utils/errors.js";
 
 // POST /api/courses/:courseId/progress/start
-export const startOrResumeCourse = async (req, res) => {
+export const startOrResumeCourse = async (req, res, next) => {
   try {
     const { courseId } = req.params;
     const learnerId = req.user.id;
@@ -16,9 +21,7 @@ export const startOrResumeCourse = async (req, res) => {
     });
 
     if (!enrollment) {
-      return res
-        .status(403)
-        .json({ message: "Active enrollment required to start course" });
+      return next(new ForbiddenError("Active enrollment required to start course"));
     }
 
     let progress = await Progress.findOne({ enrollment: enrollment.id });
@@ -34,14 +37,14 @@ export const startOrResumeCourse = async (req, res) => {
       });
     }
 
-    res.status(200).json({ progress });
+    res.status(200).json({ success: true, data: {progress} });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    next(error);
   }
 };
 
 // POST /api/resources/:resourceId/view
-export const markResourceViewed = async (req, res) => {
+export const markResourceViewed = async (req, res, next) => {
   try {
     const { resourceId } = req.params;
     const learnerId = req.user.id;
@@ -49,15 +52,13 @@ export const markResourceViewed = async (req, res) => {
     // 1. Vérifier si la ressource existe
     const resource = await Resource.findById(resourceId);
     if (!resource) {
-      return res.status(404).json({ message: "Resource not found" });
+      return next(new NotFoundError("Resource not found"));
     }
 
     // 2. Trouver le module lié pour identifier le cours
     const moduleDoc = await Module.findById(resource.module);
     if (!moduleDoc) {
-      return res
-        .status(404)
-        .json({ message: "Module not found for this resource" });
+      return next(new NotFoundError("Module not found for this resource"));
     }
 
     // 3. Récupérer le document de progression de l'apprenant
@@ -67,9 +68,7 @@ export const markResourceViewed = async (req, res) => {
     });
 
     if (!progress) {
-      return res
-        .status(400)
-        .json({ message: "Please start the course before viewing resources" });
+      return next(new BadRequestError("Please start the course before viewing resources"));
     }
 
     // 4. Vérifier si la ressource est déjà marquée vue (éviter les doublons)
@@ -84,14 +83,16 @@ export const markResourceViewed = async (req, res) => {
 
     res.status(200).json({
       message: "Resource marked as viewed",
-      progress,
+      data : {
+        progress
+      }
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    next(error);
   }
 };
 // POST /api/modules/:moduleId/complete
-export const completeModule = async (req, res) => {
+export const completeModule = async (req, res, next) => {
   try {
     const { moduleId } = req.params;
     const learnerId = req.user.id;
@@ -99,7 +100,7 @@ export const completeModule = async (req, res) => {
     // 1. Récupérer le module demandé
     const currentModule = await Module.findById(moduleId);
     if (!currentModule) {
-      return res.status(404).json({ message: "Module not found" });
+      return next(new NotFoundError("Module not found"));
     }
 
     const courseId = currentModule.course;
@@ -111,7 +112,7 @@ export const completeModule = async (req, res) => {
     });
 
     if (!progress) {
-      return res.status(400).json({ message: "Please start the course first" });
+      return next(new BadRequestError("Please start the course first"));
     }
 
     // Si le module est déjà validé, pas besoin de refaire les calculs
@@ -121,7 +122,13 @@ export const completeModule = async (req, res) => {
     if (isAlreadyDone) {
       return res
         .status(200)
-        .json({ message: "Module already completed", progress });
+        .json({ 
+          success: true,
+          message: "Module already completed", 
+          data: {
+            progress
+          }
+        });
     }
 
     // 3. Récupérer tous les modules du cours dans l'ordre
@@ -140,9 +147,7 @@ export const completeModule = async (req, res) => {
       );
 
       if (!isPreviousDone) {
-        return res.status(400).json({
-          message: "Previous module must be completed first",
-        });
+        return next(new BadRequestError("Previous module must be completed first"));
       }
     }
 
@@ -155,9 +160,7 @@ export const completeModule = async (req, res) => {
     );
 
     if (!allResourcesDone) {
-      return res.status(400).json({
-        message: "All resources in this module must be viewed first",
-      });
+      return next(new BadRequestError("All resources in this module must be viewed first"));
     }
 
     // 6. Validation du module et calcul du pourcentage
@@ -169,15 +172,18 @@ export const completeModule = async (req, res) => {
     await progress.save();
 
     res.status(200).json({
+      seccess: true,
       message: "Module completed successfully",
-      progress,
+      data: {
+        progress
+      }
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    next(error);
   }
 };
 // GET /api/courses/:courseId/progression
-export const getCourseProgression = async (req, res) => {
+export const getCourseProgression = async (req, res, next) => {
   try {
     const { courseId } = req.params;
     const learnerId = req.user.id;
@@ -189,9 +195,7 @@ export const getCourseProgression = async (req, res) => {
     });
 
     if (!progress) {
-      return res
-        .status(404)
-        .json({ message: "Progress not found. Please start the course first" });
+      return next(new NotFoundError("Progress not found. Please start the course first"));
     }
 
     // 2. Récupérer tous les modules triés par ordre
@@ -280,12 +284,15 @@ export const getCourseProgression = async (req, res) => {
 
     // 4. Réponse envoyée
     res.status(200).json({
-      courseId: courseId,
-      percent: progress.percent,
-      completedResourcesCount: progress.completedResources.length,
-      modules: modulesWithStatus,
+      success: true,
+      data: {
+        courseId: courseId,
+        percent: progress.percent,
+        completedResourcesCount: progress.completedResources.length,
+        modules: modulesWithStatus,
+      }
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    next(error);
   }
 };

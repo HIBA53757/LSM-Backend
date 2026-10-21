@@ -36,15 +36,15 @@ describe("Cours", () => {
     const res = await request(app).get("/api/courses");
 
     expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
+    expect(Array.isArray(res.body.data.courses)).toBe(true);
   });
 
   test("Récupérer un cours par ID", async () => {
     const res = await request(app).get(`/api/courses/${courseId}`);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body._id).toBe(courseId);
-    expect(res.body).toHaveProperty("title");
+    expect(res.body.data.course._id).toBe(courseId);
+    expect(res.body.data.course).toHaveProperty("title");
   });
 });
 

@@ -1,4 +1,5 @@
 import Course from "../models/course.js";
+import { ForbiddenError, NotFoundError } from "../utils/errors.js";
 
 export async function ownCourse(req, res, next) {
     try {
@@ -6,10 +7,7 @@ export async function ownCourse(req, res, next) {
         const course = await Course.findById(courseId);
 
         if (!course) {
-            return res.status(404).json({
-                success: false,
-                message: "Course not found"
-            });
+            return next(new NotFoundError("Course not found"));
         }
 
         if (req.user.role === "admin") {
@@ -22,10 +20,7 @@ export async function ownCourse(req, res, next) {
 
         
         if (course.trainer.toString() !== req.user.id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: "You are not allowed to modify this course"
-            });
+            return next(new ForbiddenError("You are not allowed to modify this course"));
         }
         req.course = course;
         next();
