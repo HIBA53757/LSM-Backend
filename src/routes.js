@@ -14,7 +14,7 @@ const router = express.Router()
 router.use("/auth", authRoutes);
 router.use("/courses", courseRoutes);
 router.use("/modules", moduleRoutes);
-router.use("", enrollmentRoutes);
+router.use("/enrollments", enrollmentRoutes);
 router.use("/resources", resourceRoutes);
 router.use("/progress", progressionRoutes);
 router.use("/trainer", trainerRoutes)
