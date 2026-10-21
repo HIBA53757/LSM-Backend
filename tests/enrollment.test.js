@@ -5,6 +5,7 @@
 import request from "supertest";
 import mongoose from "mongoose";
 import app from "../src/app.js";
+import { connectDB } from "../src/config/database.js";
 
 // --- Variables de test ---
 let token = "";
@@ -15,9 +16,7 @@ const testEmail = `enroll_${Date.now()}@test.com`;
 
 // --- Connexion + préparation des données ---
 beforeAll(async () => {
-  await mongoose.connect(
-    process.env.MONGO_URI || "mongodb://localhost:27017/lms",
-  );
+  await connectDB()
 
   // 1. On crée un utilisateur de test
   const registerRes = await request(app).post("/api/auth/register").send({
