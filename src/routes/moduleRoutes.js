@@ -8,13 +8,14 @@ import { ownModule } from "../middlewares/ownModule.js";
 
 const router = express.Router();
 
-router.get("/:moduleId/resources", getResourcesByModule);
+router.get("/:moduleId/resources",authenticate, getResourcesByModule);
 
-router.post("/courses/:courseId/modules",authenticate ,authorize("admin","trainer"), ownCourse, createModule)
+router.post("/courses/:courseId",authenticate ,authorize("admin","trainer"), ownCourse, createModule)
 
-router.patch("/:courseId/:moduleId/modules",authenticate,authorize("admin","trainer"),ownCourse ,ownModule, updateModule)
+router.put("/:moduleId",authenticate,authorize("admin","trainer"),ownModule, updateModule)
 
-router.patch("/courses/:courseId/modules/:moduleId/publish", authenticate, authorize("trainer", "admin"), ownCourse, ownModule, publishModule)
+router.patch("/:moduleId/publish", authenticate, authorize("trainer", "admin"), ownModule, publishModule)
 
-router.patch("/courses/:courseId/modules/:moduleId/unpublish", authenticate, authorize("trainer", "admin"), ownCourse, ownModule, unpublishModule)
+router.patch("/:moduleId/unpublish", authenticate, authorize("trainer", "admin"), ownModule, unpublishModule)
+
 export default router;
