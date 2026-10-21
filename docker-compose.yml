@@ -1,7 +1,7 @@
 services:
   mongodb:
     image: mongo:8
-    container_name: lms-mongodb
+    container_name: lms-mongodb-breif3
     ports:
       - "27017:27017"
     volumes:
