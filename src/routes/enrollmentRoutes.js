@@ -8,6 +8,14 @@ import { authenticate, authorize } from "../middlewares/Auth.js";
 
 const router = express.Router();
 
+router.get(
+  "/me",
+  authenticate,
+  authorize("learner"),
+  getMyEnrollments,
+);
+
+
 router.post(
   "/courses/:courseId/enroll",
   authenticate,
@@ -15,17 +23,11 @@ router.post(
   enrollCourse,
 );
 
-router.get(
-  "/learners/me/enrollments",
-  authenticate,
-  authorize("learner"),
-  getMyEnrollments,
-);
-
 router.patch(
-  "/enrollments/:id/cancel",
+  "/:id/cancel",
   authenticate,
   authorize("learner"),
   cancelEnrollment,
 );
+
 export default router;

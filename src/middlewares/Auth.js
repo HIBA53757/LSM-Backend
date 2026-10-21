@@ -19,7 +19,7 @@ export async function authenticate(req, res, next) {
     const token = authHeader.split(" ")[1];
 
     // 4. Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secretkey");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // 5. Find the user
     const user = await User.findById(decoded.id).select("-password");
