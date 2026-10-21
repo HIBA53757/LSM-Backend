@@ -23,6 +23,7 @@ async function seed() {
 
         if (!trainer) {
             trainer = await User.create({
+                name:"hiba",
                 email: "hiba@gmail.com",
                 password: "password123",
                 role: "trainer",

@@ -14,8 +14,11 @@ export async function getTrainerCourses(req, res, next) {
         })
         res.status(200).json({
             success: true,
-            count: courses.length,
-            courses
+            data:{
+                count: courses.length,
+                courses
+            }
+            
         })
 
 
@@ -37,8 +40,10 @@ export async function getCourseLearners(req, res, next) {
 
         res.status(200).json({
             success: true,
-            count: enrollments.length,
-            learners: enrollments,
+            data: {
+                count: enrollments.length,
+                learners: enrollments
+            }
         });
     } catch (error) {
         next(error);
