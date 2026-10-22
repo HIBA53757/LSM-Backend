@@ -11,7 +11,7 @@ const emailLogSchema = new mongoose.Schema({
     },
     driver: {
         type: String,
-        enum: ["log", "sandbox", "stmp"],
+        enum: ["log", "sandbox"],
         required: true
     },
     status: {
