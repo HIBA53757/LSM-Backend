@@ -4,7 +4,8 @@ import { ForbiddenError, NotFoundError } from "../utils/errors.js";
 
 export async function ownModule(req, res, next) {
     try {
-        const module = await Module.findById(req.params.moduleId);
+        const moduleId = req.params.moduleId ?? req.body.module
+        const module = await Module.findById(moduleId);
         if (!module) {
             return next(new NotFoundError("Module not found"));
         }
