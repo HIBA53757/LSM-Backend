@@ -1,6 +1,8 @@
 import Quiz from "../models/quiz.js";
 import QuizAttempt from "../models/quizAttempt.js";
-import { ConflictError } from "../utils/errors.js";
+import { BadRequestError, ConflictError, ValidationError } from "../utils/errors.js";
+import Progress from "../models/progress.js";
+import Module from "../models/module.js";
 
 export async function listQuizzesByModule(req, res, next) {
   try {
@@ -80,3 +82,58 @@ export async function deleteQuiz(req, res, next) {
     return next(error);
   }
 }
+
+export async function viewQuiz(req, res, next){
+  try{
+    let {module, course, enrollment, quiz} = req;
+        const learnerId = req.user.id;
+    
+        const progress = await Progress.findOne({
+          learner: learnerId,
+          course: course.id,
+        });
+    
+        if (!progress) {
+          return next(new BadRequestError("Please start the course first"));
+        }
+
+        const modules = await Module.find({
+          course: course._id,
+          status: "published",
+        }).sort({ position: 1 });
+
+        
+        const currentIndex = modules.findIndex((item) => item._id.equals(module._id));
+
+        if (currentIndex < 0) {
+          return next(new ValidationError("Quiz module was not found in the course"));
+        }
+        if ( currentIndex > 0 && !progress.completedModules.some((id) => id.equals(modules[currentIndex - 1]._id)) ) {
+          return next(new ValidationError("You need to complete the previous module first"));
+        }
+
+        const quizData = quiz.toObject();
+        quizData.questions = quizData.questions.map(({ correctAnswer, ...question }) => question);
+
+        return res.status(200).json({
+          success: true,
+          message: "quiz fetched successfuly",
+          data : { quiz: quizData },
+        })
+
+    
+  }catch(error){
+    next(error)
+  }
+}
+
+// export async function submitAnswers(req, res, next){
+//   try{
+
+//     const answers = req.body.answers
+
+//   }catch(error){
+
+//     next(error)
+//   }
+// }
