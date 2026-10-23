@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{URL}}/api/feedback/6adb45be8e779b5ee145502a"
+method: PUT
+body:
+  type: json
+  content: "{\r\n    \"rating\": 4\r\n}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokentTrainer}}"
+order: 2000

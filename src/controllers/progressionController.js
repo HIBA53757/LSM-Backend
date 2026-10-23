@@ -6,6 +6,8 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../utils/errors.js";
+import Quiz from "../models/quiz.js";
+import QuizAttempt from "../models/quizAttempt.js";
 
 export async function getResourceById(req, res, next) {
     try {
@@ -155,7 +157,28 @@ export const completeModule = async (req, res, next) => {
       return next(new BadRequestError("All resources in this module must be viewed first"));
     }
 
-    // 6. Validation du module et calcul du pourcentage
+    // Each module has at most one quiz, so only check that quiz when required.
+    const requiredQuiz = await Quiz.findOne({
+      module: module._id,
+      isRequired: true,
+    }).select("_id");
+
+    if (requiredQuiz) {
+      const passedAttempt = await QuizAttempt.exists({
+        quiz: requiredQuiz._id,
+        learner: learnerId,
+        status: "submitted",
+        passed: true,
+      });
+
+      if (!passedAttempt) {
+        return next(
+          new BadRequestError("Pass all required quizzes before completing this module"),
+        );
+      }
+    }
+
+    // 6. Validate the module and calculate course progress.
     progress.completedModules.push(module.id);
     progress.percent = Math.round(
       (progress.completedModules.length / allModules.length) * 100,

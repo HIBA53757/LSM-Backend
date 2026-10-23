@@ -37,6 +37,7 @@ const quizFields = {
   questions: z.array(questionSchema).min(1),
   passingScore: z.number().min(0),
   isActive: z.boolean(),
+  isRequired: z.boolean(),
 };
 
 const quizSchema = z.object({
@@ -44,6 +45,7 @@ const quizSchema = z.object({
   ...quizFields,
 }).extend({
   isActive: z.boolean().default(false),
+  isRequired: z.boolean().default(false),
 });
 
 export const quizUpdateSchema = z.object(quizFields).partial().refine(

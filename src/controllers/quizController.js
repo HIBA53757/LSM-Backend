@@ -1,7 +1,9 @@
 import Quiz from "../models/quiz.js";
 import QuizAttempt from "../models/quizAttempt.js";
-import { ConflictError } from "../utils/errors.js";
-
+import { BadRequestError, ConflictError, ValidationError } from "../utils/errors.js";
+import Progress from "../models/progress.js";
+import Module from "../models/module.js";
+import Resource from "../models/resource.js"
 export async function listQuizzesByModule(req, res, next) {
   try {
     const quizzes = await Quiz.find({ module: req.module._id }).sort({ createdAt: -1 });
@@ -24,6 +26,13 @@ export async function getQuiz(req, res, next) {
 
 export async function createQuiz(req, res, next) {
   try {
+
+    const existingQuiz = await Quiz.exists({ module: req.module._id });
+
+    if (existingQuiz) {
+      return next(new ConflictError("A quiz already exists for this module."));
+    }
+
     const quiz = await Quiz.create({
       ...req.body,
       module: req.module._id,
@@ -35,6 +44,10 @@ export async function createQuiz(req, res, next) {
       data: { quiz },
     });
   } catch (error) {
+
+    if (error?.code === 11000) {
+      return next(new ConflictError("A quiz already exists for this module."));
+    }
     return next(error);
   }
 }
@@ -42,12 +55,13 @@ export async function createQuiz(req, res, next) {
 export async function updateQuiz(req, res, next) {
   try {
     const quiz = req.quiz;
-    const { title, questions, passingScore, isActive } = req.body;
+    const { title, questions, passingScore, isActive, isRequired } = req.body;
 
     if (title !== undefined) quiz.title = title;
     if (questions !== undefined) quiz.questions = questions;
     if (passingScore !== undefined) quiz.passingScore = passingScore;
     if (isActive !== undefined) quiz.isActive = isActive;
+    if (isRequired !== undefined) quiz.isRequired = isRequired;
 
     await quiz.save();
 
@@ -78,5 +92,140 @@ export async function deleteQuiz(req, res, next) {
     });
   } catch (error) {
     return next(error);
+  }
+}
+
+async function isResourceViewed({course, module, quiz, user}){
+  const progress = await Progress.findOne({
+      learner: user.id,
+      course: course.id,
+    });
+
+    if (!progress) {
+      throw new BadRequestError("Please start the course first");
+    }
+
+    const allModules = await Module.find({ course: course.id }).sort({position: 1});
+
+    const currentIndex = allModules.findIndex(
+      (m) => m.id.toString() === module.id.toString(),
+    );
+
+
+    if (currentIndex > 0) {
+      const previousModule = allModules[currentIndex - 1];
+      const isPreviousDone = progress.completedModules.some(
+        (id) => id.toString() === previousModule.id.toString(),
+      );
+
+      if (!isPreviousDone) {
+        throw new BadRequestError("Previous module must be completed first");
+      }
+    }
+
+
+    const moduleResources = await Resource.find({ module: module.id });
+    const allResourcesDone = moduleResources.every((resource) =>
+      progress.completedResources.some(
+        (rId) => rId.toString() === resource.id.toString(),
+      ),
+    );
+
+    if (!allResourcesDone) {
+      throw new BadRequestError("All resources in this module must be viewed first");
+    }
+
+    const quizAttempt = await QuizAttempt.findOne({
+      quiz: quiz.id,
+      learner: user.id,
+      status: "submitted",
+      passed: true,
+    });
+
+    if(quizAttempt){
+      throw new ConflictError('You have already passed this Quiz')
+    }
+}
+
+export async function viewQuiz(req, res, next){
+  try{
+    let {module, course, enrollment, quiz} = req;
+        const learnerId = req.user.id;
+    
+        await isResourceViewed(req)
+
+        const quizData = quiz.toObject();
+        quizData.questions = quizData.questions.map(({ correctAnswer, ...question }) => question);
+
+        return res.status(200).json({
+          success: true,
+          message: "quiz fetched successfuly",
+          data : { quiz: quizData },
+        })
+
+    
+  }catch(error){
+    next(error)
+  }
+}
+
+export async function submitAnswers(req, res, next){
+  try{
+    const {course, module, quiz} = req
+    const userId = req.user.id
+
+    await isResourceViewed(req)
+
+    const userAnswers = req.body.answers
+    const quizQuestions = quiz.questions
+
+    const report = userAnswers.reduce((report, answer) => {
+
+      const question = quizQuestions.find((question) => question.id.toString() === answer.questionId)
+
+
+      if(question.correctAnswer === answer.selectedChoice){
+        report.score += question.points
+        report.passed +=1
+      }
+
+      report.questionResults.push({
+        question: question.id.toString(),
+        selectedChoice: answer.selectedChoice,
+      })
+
+      return report
+
+    },{
+      questionResults: [],
+      score: 0,
+      passed: 0,
+      success: false
+    })
+
+    if(report.score >= quiz.passingScore){
+      report.success = true
+    }
+
+    const newQuizAttempt = await QuizAttempt.create({
+      learner: userId,
+      quiz: quiz.id,
+      answers: report.questionResults,
+      score: report.score,
+      passed: report.success,
+      status: "submitted",
+      submittedAt: new Date()
+    })
+
+    const { passed, ...cleanReport } = report;
+
+    res.status(200).json({
+      success : true,
+      data: {cleanReport}
+    })
+
+  }catch(error){
+
+    next(error)
   }
 }
