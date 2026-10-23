@@ -1,9 +1,9 @@
 import nodemailer from "nodemailer";
 import EmailLog from "../../models/emailLog.js";
 
-export async function sendEmail({ to, subject, text, html ,  driver = process.env.EMAIL_DRIVER || "log" }) {
-  
+export async function sendEmail({ to, subject, text, html, driver = process.env.EMAIL_DRIVER || "log" }) {
 
+  console.log("EMAIL_DRIVER loaded:", process.env.EMAIL_DRIVER);
   if (!["log", "sandbox"].includes(driver)) {
     throw new Error(`Unsupported email driver: ${driver}`);
   }
@@ -32,10 +32,10 @@ export async function sendEmail({ to, subject, text, html ,  driver = process.en
 
       await transporter.sendMail({
         from: process.env.EMAIL_FROM,
-        to,
-        subject,
-        text,
-        html,
+        to: to,
+        subject: subject,
+        text: text,
+        html: html,
       });
     }
   } catch (error) {

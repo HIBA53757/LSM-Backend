@@ -20,7 +20,7 @@ const emailLogSchema = new mongoose.Schema({
         required: true
     },
     error: {
-        typr: String,
+        type: String,
         default: null
 
     },
