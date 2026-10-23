@@ -49,10 +49,17 @@ const quizSchema = mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    isRequired: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 
 },
 { timestamps: true },
 );
+
+quizSchema.index({ module: 1 }, { unique: true });
 
 export default mongoose.model("Quiz", quizSchema);
