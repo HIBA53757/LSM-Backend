@@ -6,6 +6,8 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../utils/errors.js";
+import Quiz from "../models/quiz.js";
+import QuizAttempt from "../models/quizAttempt.js";
 
 export async function getResourceById(req, res, next) {
     try {
@@ -160,6 +162,18 @@ export const completeModule = async (req, res, next) => {
     progress.percent = Math.round(
       (progress.completedModules.length / allModules.length) * 100,
     );
+
+    const quiz = await Quiz.findOne({module: module.id})
+
+    if(quiz){
+
+      const quizAttempt = await QuizAttempt.findOne({quiz: quiz.id, learner: learnerId})
+
+      if(!quizAttempt){
+        throw new NotFoundError("You Haven't pass Quiz !")
+      }
+
+    }
 
     await progress.save();
 
