@@ -28,7 +28,7 @@ export async function createQuiz(req, res, next) {
   try {
 
     const existingQuiz = await Quiz.exists({ module: req.module._id });
-    
+
     if (existingQuiz) {
       return next(new ConflictError("A quiz already exists for this module."));
     }
@@ -183,10 +183,8 @@ export async function submitAnswers(req, res, next){
 
       const question = quizQuestions.find((question) => question.id.toString() === answer.questionId)
 
-      let awardedPoints = 0
 
       if(question.correctAnswer === answer.selectedChoice){
-        awardedPoints = question.points
         report.score += question.points
         report.passed +=1
       }
@@ -194,7 +192,6 @@ export async function submitAnswers(req, res, next){
       report.questionResults.push({
         question: question.id.toString(),
         selectedChoice: answer.selectedChoice,
-        awardedPoints
       })
 
       return report
@@ -220,9 +217,11 @@ export async function submitAnswers(req, res, next){
       submittedAt: new Date()
     })
 
+    const { passed, ...cleanReport } = report;
+
     res.status(200).json({
       success : true,
-      data: {report}
+      data: {cleanReport}
     })
 
   }catch(error){
