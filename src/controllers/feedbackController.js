@@ -48,7 +48,7 @@ export async function createFeedback(req, res, next) {
         }
 
         const feedback = await Feedback.create({
-            trainer : getCourse.trainer,
+            trainer: getCourse.trainer,
             learner,
             course,
             progress,
@@ -65,6 +65,19 @@ export async function createFeedback(req, res, next) {
     }
 }
 
+export async function getAllFeedbacks(req, res, next) {
+    try {
+        const feedbacks = await Feedback.find().populate('trainer', "name email")
+            .populate("learner", "name email").populate('course').populate("progress");
+        return res.status(200).json({
+            feedbacks
+        })
+    }
+    catch (err) {
+        next(err)
+    }
+
+}
 
 export async function getMyFeedbacks(req, res, next) {
     try {
