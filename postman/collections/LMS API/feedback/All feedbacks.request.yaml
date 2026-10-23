@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{URL}}/api/feedback"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenAdmin}}"
+order: 5000
