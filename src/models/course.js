@@ -60,6 +60,22 @@ const courseSchema = new mongoose.Schema(
     }
 );
 
+courseSchema.virtual("modules", {
+  ref: "Module",
+  localField: "_id",
+  foreignField: "course",
+});
+
+courseSchema.virtual("enrollments", {
+  ref: "Enrollment",
+  localField: "_id",
+  foreignField: "course",
+});
+
+courseSchema.set("toJSON", {
+  virtuals: true,
+});
+
 const Course = mongoose.model("Course", courseSchema);
 
 export default Course;

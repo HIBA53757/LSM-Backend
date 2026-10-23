@@ -60,6 +60,16 @@ const quizSchema = mongoose.Schema({
 { timestamps: true },
 );
 
+quizSchema.virtual("quizzesAttemps", {
+  ref: "QuizAttempt",
+  localField: "_id",
+  foreignField: "quiz",
+});
+
+quizSchema.set("toJSON", {
+  virtuals: true,
+});
+
 quizSchema.index({ module: 1 }, { unique: true });
 
 export default mongoose.model("Quiz", quizSchema);

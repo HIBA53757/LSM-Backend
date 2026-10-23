@@ -178,8 +178,48 @@ export async function submitAnswers(req, res, next){
 
     const userAnswers = req.body.answers
     const quizQuestions = quiz.questions
+    const quizQuestionsIds = quizQuestions.map(question => question.id.toString())
 
-    const report = userAnswers.reduce((report, answer) => {
+    if(userAnswers.length !== quizQuestions.length){
+      throw new BadRequestError("You must Answer All Questions")
+    }
+
+    const userAnswersClean = userAnswers.reduce((answers, question) => {
+      let flag = false
+      answers.forEach(answer => {
+        if(answer.questionId === question.questionId){
+          flag = true
+        }
+      });
+      if(flag === false){
+        answers.push(question)
+      }
+      return answers
+    },[])
+
+    if(userAnswersClean.length !== quizQuestions.length){
+      throw new BadRequestError("You must Answer All Questions")
+    }
+
+    userAnswersClean.forEach(answer => {
+      const question = quizQuestions.find(question => question.id.toString() === answer.questionId)
+      if(answer.selectedChoice === null || answer.selectedChoice === undefined || answer.selectedChoice > question.choices.length || answer.selectedChoice <= 0){
+        throw new BadRequestError("You must Submit valid choices")
+      }
+    });
+
+    const foundedQuestions = userAnswersClean.reduce((founded, answer) => {
+      if(quizQuestionsIds.includes(answer.questionId)){
+        return founded += 1
+      }
+      return founded
+    },0)
+
+    if(quizQuestions.length !== foundedQuestions){
+      throw new BadRequestError("You must Answer All Questions")
+    }
+
+    const report = userAnswersClean.reduce((report, answer) => {
 
       const question = quizQuestions.find((question) => question.id.toString() === answer.questionId)
 
