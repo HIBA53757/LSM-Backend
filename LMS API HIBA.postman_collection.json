@@ -100,7 +100,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/auth/login",
+							"raw": "{{base`Url`}}/api/auth/login",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -164,14 +164,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/courses/{{courseId}}",
+							"raw": "{{baseUrl}}/api/courses/",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"courses",
-								"{{courseId}}"
+								""
 							]
 						}
 					},
@@ -348,12 +348,13 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/courses/{{courseId}}/enroll",
+							"raw": "{{baseUrl}}/api/enrollments/courses/{{courseId}}/enroll",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
+								"enrollments",
 								"courses",
 								"{{courseId}}",
 								"enroll"
@@ -437,7 +438,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/modules/courses/{{courseId}}/modules",
+							"raw": "{{baseUrl}}/api/modules/courses/{{courseId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -445,8 +446,7 @@
 								"api",
 								"modules",
 								"courses",
-								"{{courseId}}",
-								"modules"
+								"{{courseId}}"
 							]
 						}
 					},
@@ -455,7 +455,7 @@
 				{
 					"name": "Update module",
 					"request": {
-						"method": "PATCH",
+						"method": "PUT",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -472,16 +472,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/modules/{{courseId}}/{{moduleId}}/modules",
+							"raw": "{{baseUrl}}/api/modules/{{moduleId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"modules",
-								"{{courseId}}",
-								"{{moduleId}}",
-								"modules"
+								"{{moduleId}}"
 							]
 						}
 					},
@@ -493,15 +491,12 @@
 						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/modules/courses/{{courseId}}/modules/{{moduleId}}/publish",
+							"raw": "{{baseUrl}}/api/modules/{{moduleId}}/publish",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"modules",
-								"courses",
-								"{{courseId}}",
 								"modules",
 								"{{moduleId}}",
 								"publish"
@@ -516,15 +511,12 @@
 						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/modules/courses/{{courseId}}/modules/{{moduleId}}/unpublish",
+							"raw": "{{baseUrl}}/api/modules/{{moduleId}}/unpublish",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"modules",
-								"courses",
-								"{{courseId}}",
 								"modules",
 								"{{moduleId}}",
 								"unpublish"
@@ -709,34 +701,12 @@
 			"name": "Progress",
 			"item": [
 				{
-					"name": "Start or resume course",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/progress/courses/{{courseId}}/progress/start",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"progress",
-								"courses",
-								"{{courseId}}",
-								"progress",
-								"start"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Mark resource as viewed",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/progress/resources/{{resourceId}}/view",
+							"raw": "{{baseUrl}}/api/progress/resources/{{resourceId}}/complete",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -745,7 +715,7 @@
 								"progress",
 								"resources",
 								"{{resourceId}}",
-								"view"
+								"complete"
 							]
 						}
 					},
@@ -788,6 +758,27 @@
 								"courses",
 								"{{courseId}}",
 								"progression"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resume Resource",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/progress/resources/{{resourceId}}/view",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"progress",
+								"resources",
+								"{{resourceId}}",
+								"view"
 							]
 						}
 					},
@@ -931,6 +922,224 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "Quiz - management",
+			"item": [
+				{
+					"name": "get quiz on Module",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/quizzes/modules/{{moduleId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"quizzes",
+								"modules",
+								"{{moduleId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get quiz by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"module\": \"6ad8d75855118298aa76ec46\",\n  \"title\": \"JavaScript Basics Quiz\",\n  \"questions\": [\n    {\n      \"text\": \"Which keyword declares a constant in JavaScript?\",\n      \"choices\": [\n        {\n          \"number\": 1,\n          \"text\": \"var\"\n        },\n        {\n          \"number\": 2,\n          \"text\": \"const\"\n        },\n        {\n          \"number\": 3,\n          \"text\": \"let\"\n        }\n      ],\n      \"correctAnswer\": 2,\n      \"points\": 5\n    },\n    {\n      \"text\": \"Which value represents true or false?\",\n      \"choices\": [\n        {\n          \"number\": 1,\n          \"text\": \"Boolean\"\n        },\n        {\n          \"number\": 2,\n          \"text\": \"String\"\n        }\n      ],\n      \"correctAnswer\": 1,\n      \"points\": 5\n    }\n  ],\n  \"passingScore\": 7,\n  \"isActive\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/quizzes/{{quizId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"quizzes",
+								"{{quizId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create quiz",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"module\": \"6ad8d75855118298aa76ec46\",\n  \"title\": \"JavaScript Basics Quiz\",\n  \"questions\": [\n    {\n      \"text\": \"Which keyword declares a constant in JavaScript?\",\n      \"choices\": [\n        {\n          \"number\": 1,\n          \"text\": \"var\"\n        },\n        {\n          \"number\": 2,\n          \"text\": \"const\"\n        },\n        {\n          \"number\": 3,\n          \"text\": \"let\"\n        }\n      ],\n      \"correctAnswer\": 2,\n      \"points\": 5\n    },\n    {\n      \"text\": \"Which value represents true or false?\",\n      \"choices\": [\n        {\n          \"number\": 1,\n          \"text\": \"Boolean\"\n        },\n        {\n          \"number\": 2,\n          \"text\": \"String\"\n        }\n      ],\n      \"correctAnswer\": 1,\n      \"points\": 5\n    }\n  ],\n  \"passingScore\": 7,\n  \"isActive\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/quizzes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"quizzes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update quiz",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passingScore\": 50,\n  \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/quizzes/{{quizId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"quizzes",
+								"{{quizId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete quiz",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"passingScore\": 50,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/quizzes/{{quizId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"quizzes",
+								"{{quizId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Quiz learner",
+			"item": [
+				{
+					"name": "quiz view",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "submit answer",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		}
 	],
 	"variable": [
@@ -961,6 +1170,11 @@
 		{
 			"key": "filePath",
 			"value": ""
+		},
+		{
+			"key": "quizId",
+			"value": "",
+			"type": "default"
 		}
 	]
 }

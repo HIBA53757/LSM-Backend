@@ -43,6 +43,16 @@ const moduleSchema = new mongoose.Schema(
     }
 );
 
+moduleSchema.virtual("quizzes", {
+  ref: "Quiz",
+  localField: "_id",
+  foreignField: "module",
+});
+
+moduleSchema.set("toJSON", {
+  virtuals: true,
+});
+
 const Module = mongoose.model("Module", moduleSchema);
 
 export default Module;

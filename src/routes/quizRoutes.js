@@ -12,7 +12,7 @@ import { authenticate, authorize } from "../middlewares/Auth.js";
 import { ownModule } from "../middlewares/ownModule.js";
 import { ownQuiz } from "../middlewares/ownQuiz.js";
 import { schemaValidate } from "../middlewares/schemaValidate.js";
-import quizSchema, { quizUpdateSchema } from "../validations/quizValidation.js";
+import quizSchema, { quizUpdateSchema, submitAnswersSchema } from "../validations/quizValidation.js";
 import { requireActiveEnrollment } from "../middlewares/activeEnrollment.js";
 
 const router = express.Router();
@@ -36,6 +36,7 @@ router.get("/:quizId/view",
 router.post("/submit",
   authenticate,
   authorize("learner"),
+  schemaValidate(submitAnswersSchema),
   requireActiveEnrollment("quiz", "quiz", true),
   submitAnswers
 )
