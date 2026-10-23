@@ -4,6 +4,7 @@ import {
   deleteQuiz,
   getQuiz,
   listQuizzesByModule,
+  submitAnswers,
   updateQuiz,
   viewQuiz
 } from "../controllers/quizController.js";
@@ -32,11 +33,12 @@ router.get("/:quizId/view",
   viewQuiz
 )
 
-// router.post("/submit",
-//   authenticate,
-//   authorize("learner"),
-//   requireActiveEnrollment("quiz", "quizId", true)
-// )
+router.post("/submit",
+  authenticate,
+  authorize("learner"),
+  requireActiveEnrollment("quiz", "quiz", true),
+  submitAnswers
+)
 
 router.get(
   "/:quizId",
