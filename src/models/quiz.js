@@ -60,4 +60,6 @@ const quizSchema = mongoose.Schema({
 { timestamps: true },
 );
 
+quizSchema.index({ module: 1 }, { unique: true });
+
 export default mongoose.model("Quiz", quizSchema);

@@ -164,7 +164,7 @@ export const completeModule = async (req, res, next) => {
     }).select("_id");
 
     if (requiredQuiz) {
-      const passedAttempt = await QuizAttempt.extiss({
+      const passedAttempt = await QuizAttempt.exists({
         quiz: requiredQuiz._id,
         learner: learnerId,
         status: "submitted",

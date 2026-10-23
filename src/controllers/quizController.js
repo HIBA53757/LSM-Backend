@@ -26,6 +26,13 @@ export async function getQuiz(req, res, next) {
 
 export async function createQuiz(req, res, next) {
   try {
+
+    const existingQuiz = await Quiz.exists({ module: req.module._id });
+    
+    if (existingQuiz) {
+      return next(new ConflictError("A quiz already exists for this module."));
+    }
+
     const quiz = await Quiz.create({
       ...req.body,
       module: req.module._id,
@@ -37,6 +44,10 @@ export async function createQuiz(req, res, next) {
       data: { quiz },
     });
   } catch (error) {
+
+    if (error?.code === 11000) {
+      return next(new ConflictError("A quiz already exists for this module."));
+    }
     return next(error);
   }
 }

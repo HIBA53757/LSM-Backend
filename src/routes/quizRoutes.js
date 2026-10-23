@@ -40,6 +40,8 @@ router.post("/submit",
   submitAnswers
 )
 
+//trainer
+
 router.get(
   "/:quizId",
   authenticate,
