@@ -12,25 +12,6 @@ const questionSchema = z
     correctAnswer: z.number().int().min(1),
     points: z.number().min(0),
   })
-  .superRefine((question, ctx) => {
-    const numbers = question.choices.map((choice) => choice.number);
-
-    if (new Set(numbers).size !== numbers.length) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["choices"],
-        message: "Choice numbers must be unique.",
-      });
-    }
-
-    if (!numbers.includes(question.correctAnswer)) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["correctAnswer"],
-        message: "Correct answer must match a choice number.",
-      });
-    }
-  });
 
 const quizFields = {
   title: z.string().trim().min(3),
@@ -52,5 +33,15 @@ export const quizUpdateSchema = z.object(quizFields).partial().refine(
   (data) => Object.keys(data).length > 0,
   "At least one field must be provided.",
 );
+
+const quizAnswerSchema = z.object({
+  questionId: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid question ID."),
+  selectedChoice: z.number().int().min(1),
+});
+
+export const submitAnswersSchema = z.object({
+  quiz: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid quiz ID."),
+  answers: z.array(quizAnswerSchema).min(1),
+});
 
 export default quizSchema;
