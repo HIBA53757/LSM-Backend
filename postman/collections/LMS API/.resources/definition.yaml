@@ -1,4 +1,14 @@
 $kind: collection
 variables:
-  URL: ""
-  token: ""
+  - key: URL
+    value: ""
+    disabled: false
+  - key: tokenAdmin
+    secret: true
+    disabled: false
+  - key: tokenLearner
+    secret: true
+    disabled: false
+  - key: tokentTrainer
+    value: ""
+    disabled: false

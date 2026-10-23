@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{URL}}/api/feedback/6adb45be8e779b5ee145502a"
+method: DELETE
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokentTrainer}}"
+order: 1802

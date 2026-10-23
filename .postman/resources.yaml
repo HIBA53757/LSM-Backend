@@ -4,4 +4,4 @@ workspace:
 
 localResources:
   collections:
-    - ../LMS API HIBA.postman_collection.json
+    - ../LMS API HIBA
