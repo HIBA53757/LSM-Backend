@@ -1,25 +1,44 @@
 import Course from "../models/course.js";
 import Feedback from "../models/Feedback.js";
 import Progress from "../models/progress.js";
+import User from "../models/User.js";
 
 export async function createFeedback(req, res, next) {
     try {
-        const { course, progress, message, rating } = req.body;
+        const { learner, course, progress, message, rating } = req.body;
 
         const trainer = req.user.id;
 
-        const getCourse = await Course.findOne({
-            _id: course,
-            trainer: trainer
+        const getLearner = await User.findOne({
+            _id: learner,
+            role: 'learner'
         })
+        if (!getLearner) {
+            return res.status(404).json({
+                message: "Learner not found",
+            })
+        }
+        const getCourse = await Course.findById(course)
+
         if (!getCourse) {
             return res.status(404).json({
                 message: "Course not found",
             })
         }
+
+        const isOwner = getCourse.trainer.toString() === trainer;
+        const isAdmin = req.user.role === "admin";
+
+        if (!isAdmin && !isOwner) {
+            return res.status(403).json({
+                message: "You are not allowed to create feedback for this course"
+            });
+        }
+
         const getProgress = await Progress.findOne({
             _id: progress,
             course: course,
+            learner: learner
         });
 
         if (!getProgress) {
@@ -29,8 +48,8 @@ export async function createFeedback(req, res, next) {
         }
 
         const feedback = await Feedback.create({
-            trainer,
-            learner: getProgress.learner,
+            trainer : getCourse.trainer,
+            learner,
             course,
             progress,
             message,
@@ -79,7 +98,7 @@ export async function updateFeedback(req, res, next) {
             });
         }
 
-        const isOwner =feedback.trainer.toString() === req.user.id;
+        const isOwner = feedback.trainer.toString() === req.user.id;
         const isAdmin = req.user.role === "admin";
 
         if (!isAdmin && !isOwner) {
