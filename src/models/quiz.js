@@ -49,6 +49,11 @@ const quizSchema = mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    isRequired: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 
 },

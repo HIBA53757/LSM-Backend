@@ -44,12 +44,13 @@ export async function createQuiz(req, res, next) {
 export async function updateQuiz(req, res, next) {
   try {
     const quiz = req.quiz;
-    const { title, questions, passingScore, isActive } = req.body;
+    const { title, questions, passingScore, isActive, isRequired } = req.body;
 
     if (title !== undefined) quiz.title = title;
     if (questions !== undefined) quiz.questions = questions;
     if (passingScore !== undefined) quiz.passingScore = passingScore;
     if (isActive !== undefined) quiz.isActive = isActive;
+    if (isRequired !== undefined) quiz.isRequired = isRequired;
 
     await quiz.save();
 
@@ -123,7 +124,12 @@ async function isResourceViewed({course, module, quiz, user}){
       throw new BadRequestError("All resources in this module must be viewed first");
     }
 
-    const quizAttempt = await QuizAttempt.findOne({quiz : quiz.id, learner: user.id})
+    const quizAttempt = await QuizAttempt.findOne({
+      quiz: quiz.id,
+      learner: user.id,
+      status: "submitted",
+      passed: true,
+    });
 
     if(quizAttempt){
       throw new ConflictError('You have already passed this Quiz')
