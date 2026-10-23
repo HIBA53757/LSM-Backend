@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import { comparePassword, createToken, hashPassword } from "../utils/jwtHelper.js";
-import {ConflictError, ValidationError } from "../utils/errors.js";
+import { ConflictError, ValidationError } from "../utils/errors.js";
+import { sendWelcomeEmail } from "../services/email/notificationService.js";
 
 // Return user information
 function getUserInfo(user) {
@@ -14,6 +15,7 @@ function getUserInfo(user) {
 
 // POST /api/auth/register
 export async function register(req, res, next) {
+   console.log("call register");
   try {
     const { name, email, password } = req.body || {};
 
@@ -39,7 +41,13 @@ export async function register(req, res, next) {
       password: hashedPassword,
       role: "learner",
     });
-
+    console.log("user created");
+    try {
+      await sendWelcomeEmail(newUser);
+       console.log("welcome email service completed");
+    } catch (emailError) {
+      console.error("Welcome email failed:", emailError.message);
+    }
     // Send response
     res.status(201).json({
       success: true,
