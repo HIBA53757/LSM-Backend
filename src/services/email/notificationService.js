@@ -25,3 +25,18 @@ export async function sendCourseEnrolledEmail(user, course) {
     html,
   });
 }
+
+export async function sendPasswordResetEmail(user, resetUrl,resetToken) {
+  const html = await renderEmailTemplate("password-reset", {
+    name: user.name,
+    resetUrl,
+    resetToken,
+  });
+
+  return sendEmail({
+    to: user.email,
+    subject: "Réinitialisation de votre mot de passe LMS",
+    html,
+  });
+}
+
