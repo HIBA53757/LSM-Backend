@@ -26,8 +26,10 @@ export async function createFeedback(req, res, next) {
             })
         }
 
-        const isOwner = getCourse.trainer.toString() === trainer;
+        const isOwner = getCourse.trainer.toString() === trainer.toString();
         const isAdmin = req.user.role === "admin";
+
+        // console.log(, isAdmin , isOwner)
 
         if (!isAdmin && !isOwner) {
             return res.status(403).json({
@@ -111,7 +113,7 @@ export async function updateFeedback(req, res, next) {
             });
         }
 
-        const isOwner = feedback.trainer.toString() === req.user.id;
+        const isOwner = feedback.trainer.toString() === req.user.id.toString();
         const isAdmin = req.user.role === "admin";
 
         if (!isAdmin && !isOwner) {
@@ -149,7 +151,7 @@ export async function deleteFeedback(req, res, next) {
         }
 
         const isOwner =
-            feedback.trainer.toString() === req.user.id;
+            feedback.trainer.toString() === req.user.id.toString();
         const isAdmin = req.user.role === "admin";
 
         if (!isAdmin && !isOwner) {
