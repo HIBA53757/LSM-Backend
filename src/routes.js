@@ -10,6 +10,7 @@ import trainerRoutes from  "./routes/trainerRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js"
 import feedbackRoutes from "./routes/feedbackRoutes.js"
 import quizRoutes from "./routes/quizRoutes.js";
+import trainerPreferenceRoutes from "./routes/trainerPreferenceRoutes.js";
 import quizAttemptRoutes from "./routes/quizAttemptsRoutes.js";
 
 const router = express.Router()
@@ -23,6 +24,7 @@ router.use("/progress", progressionRoutes);
 router.use("/trainer", trainerRoutes)
 router.use("/profiles", profileRoutes)
 router.use("/feedback" , feedbackRoutes)
+router.use("/preferences" , trainerPreferenceRoutes)
 router.use("/quizzes", quizRoutes)
 router.use("/quiz/attempts", quizAttemptRoutes)
 
