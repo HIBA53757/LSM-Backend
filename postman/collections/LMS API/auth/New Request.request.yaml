@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{URL}}/api/auth/reset-password"
+method: POST
+order: 1791558056917

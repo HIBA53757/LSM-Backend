@@ -5,3 +5,9 @@ workspace:
 localResources:
   collections:
     - ../LMS API HIBA
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../LMS API HIBA: 6c7ae0f0-1ce5-4069-8346-2129f807f03f

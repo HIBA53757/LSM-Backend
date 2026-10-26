@@ -1,0 +1,50 @@
+$kind: http-request
+url: "{{baseUrl}}/api/quizzes/{{quizId}}"
+method: GET
+body:
+  type: text
+  content: |-
+    {
+      "module": "6ad8d75855118298aa76ec46",
+      "title": "JavaScript Basics Quiz",
+      "questions": [
+        {
+          "text": "Which keyword declares a constant in JavaScript?",
+          "choices": [
+            {
+              "number": 1,
+              "text": "var"
+            },
+            {
+              "number": 2,
+              "text": "const"
+            },
+            {
+              "number": 3,
+              "text": "let"
+            }
+          ],
+          "correctAnswer": 2,
+          "points": 5
+        },
+        {
+          "text": "Which value represents true or false?",
+          "choices": [
+            {
+              "number": 1,
+              "text": "Boolean"
+            },
+            {
+              "number": 2,
+              "text": "String"
+            }
+          ],
+          "correctAnswer": 1,
+          "points": 5
+        }
+      ],
+      "passingScore": 7,
+      "isActive": false
+    }
+settings: {}
+order: 2000

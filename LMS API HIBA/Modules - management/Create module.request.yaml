@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/api/modules/courses/{{courseId}}"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Introduction",
+      "description": "Course introduction",
+      "position": 1,
+      "estimatedDuration": 20
+    }
+order: 1000

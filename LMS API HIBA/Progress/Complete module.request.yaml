@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/progress/modules/{{moduleId}}/complete"
+method: POST
+order: 2000

@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/modules/{{moduleId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Updated module title",
+      "estimatedDuration": 25
+    }
+order: 2000

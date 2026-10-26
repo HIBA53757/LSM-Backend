@@ -1,6 +1,8 @@
 import Enrollment from "../models/Enrollment.js";
 import Course from "../models/course.js";
 import { ConflictError, NotFoundError } from "../utils/errors.js";
+import User from "../models/User.js";
+import { sendCourseEnrolledEmail } from "../services/email/notificationService.js";
 
 // POST /api/courses/:courseId/enroll
 export const enrollCourse = async (req, res, next) => {
@@ -33,11 +35,24 @@ export const enrollCourse = async (req, res, next) => {
       course: courseId,
       status: "active",
     });
+    console.log("[enrollment created:", enrollment._id);
+    try {
+      const learner = await User.findById(learnerId);
+
+      console.log("[course title:", course.title);
+      if (learner) {
+        await sendCourseEnrolledEmail(learner, course)
+         console.log(" email service result:", result);
+      }
+    }
+    catch (emailError) {
+      console.error("email failed", emailError.message)
+    }
 
     res.status(201).json({
       success: true,
       message: "Successfully enrolled in course",
-      data: {enrollment},
+      data: { enrollment },
     });
   } catch (error) {
     // Handle Mongoose duplicate key error if race conditions occur
@@ -53,7 +68,7 @@ export const getMyEnrollments = async (req, res, next) => {
       .sort({ createdAt: -1 });
 
     res.status(200).json({
-      success : true,
+      success: true,
       data: {
         enrollments
       }
@@ -84,12 +99,13 @@ export const cancelEnrollment = async (req, res, next) => {
     enrollment.status = "dropped";
     await enrollment.save();
 
-    res.status(200).json({ 
-        success: true,
-        message: "Enrollment cancelled successfully",
-        data: {
-          enrollment
-        } });
+    res.status(200).json({
+      success: true,
+      message: "Enrollment cancelled successfully",
+      data: {
+        enrollment
+      }
+    });
   } catch (error) {
     next(error)
   }
