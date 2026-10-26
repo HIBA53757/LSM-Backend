@@ -5,19 +5,19 @@ body:
   type: json
   content: "{\r
 
-    \  \"trainer\": \"6ad9f419ae8a76a60238c408\",\r
+    \    \"learner\": \"6ad9f2886879987943c099b7\",\r
 
-    \  \"course\": \"6ad9f424aee90184a858bf4a\",\r
+    \    \"course\": \"6ad9f424aee90184a858bf4a\",\r
 
-    \  \"progress\": \"6ad9f9cebd7a44bca5ecb1eb\",\r
+    \    \"progress\": \"6ad9f9cebd7a44bca5ecb1eb\",\r
 
-    \  \"message\": \"Good progress in the course.\",\r
+    \    \"message\": \"Bon travail, continue tes efforts !\",\r
 
-    \  \"rating\": 5\r
+    \    \"rating\": 5\r
 
     }"
 auth:
   type: bearer
   credentials:
-    token: "{{token}}"
-order: 2000
+    token: "{{tokentTrainer}}"
+order: 3000
