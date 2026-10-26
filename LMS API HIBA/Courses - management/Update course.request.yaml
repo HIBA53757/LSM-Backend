@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/courses/{{courseId}}"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Updated course title",
+      "estimatedDuration": 35
+    }
+order: 2000

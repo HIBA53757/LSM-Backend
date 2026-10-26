@@ -1,0 +1,11 @@
+$kind: collection
+description: Complete LMS API collection. Set the collection variables before running requests. Login stores the JWT in the token variable.
+variables:
+  baseUrl: http://localhost:3001
+  token: ""
+  courseId: ""
+  moduleId: ""
+  resourceId: ""
+  enrollmentId: ""
+  filePath: ""
+  quizId: ""

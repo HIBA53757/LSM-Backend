@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/api/courses"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "JavaScript Fundamentals",
+      "description": "Learn JavaScript basics",
+      "objectives": ["Variables", "Functions", "Objects"],
+      "level": "beginner",
+      "category": "Programming",
+      "estimatedDuration": 30
+    }
+order: 1000

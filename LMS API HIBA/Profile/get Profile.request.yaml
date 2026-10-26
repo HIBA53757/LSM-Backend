@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/profiles/me"
+method: GET
+body:
+  type: text
+  content: ""
+auth:
+  type: bearer
+settings: {}
+order: 1000

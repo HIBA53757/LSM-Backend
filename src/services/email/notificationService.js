@@ -12,3 +12,31 @@ export async function sendWelcomeEmail(user) {
     html,
   });
 }
+
+export async function sendCourseEnrolledEmail(user, course) {
+  const html = await renderEmailTemplate("course-enrolled", {
+    name: user.name,
+    courseTitle: course.title,
+  });
+   
+  return sendEmail({
+    to: user.email,
+    subject: `Inscription confirmée : ${course.title}`,
+    html,
+  });
+}
+
+export async function sendPasswordResetEmail(user, resetUrl,resetToken) {
+  const html = await renderEmailTemplate("password-reset", {
+    name: user.name,
+    resetUrl,
+    resetToken,
+  });
+
+  return sendEmail({
+    to: user.email,
+    subject: "Réinitialisation de votre mot de passe LMS",
+    html,
+  });
+}
+

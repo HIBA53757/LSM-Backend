@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/courses/{{courseId}}/modules"
+method: GET
+order: 3000

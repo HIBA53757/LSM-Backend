@@ -21,18 +21,6 @@ async function seed() {
             role: "trainer"
         });
 
-        if (!trainer) {
-            trainer = await User.create({
-                name:"hiba",
-                email: "hiba@gmail.com",
-                password: "password123",
-                role: "trainer",
-                accountStatus: "active"
-            });
-
-            console.log("Trainer created");
-        }
-
         const courses = await Course.insertMany([
             {
                 title: "JavaScript Fundamentals",

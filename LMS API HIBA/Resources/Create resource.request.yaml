@@ -1,0 +1,29 @@
+$kind: http-request
+url: "{{baseUrl}}/api/resources/courses/{{courseId}}/modules/{{moduleId}}/resources"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: title
+      value: Introduction article
+    - type: text
+      key: type
+      value: article
+    - type: text
+      key: content
+      value: Resource content
+    - type: text
+      key: url
+      value: ""
+    - type: text
+      key: description
+      value: Resource description
+    - type: text
+      key: position
+      value: "1"
+    - type: file
+      key: file
+      src: "{{filePath}}"
+      disabled: true
+order: 2000

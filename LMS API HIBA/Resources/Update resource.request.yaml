@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/api/resources/{{courseId}}/{{moduleId}}/resources/{{resourceId}}"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Updated resource",
+      "description": "Updated description",
+      "position": 1
+    }
+order: 3000
