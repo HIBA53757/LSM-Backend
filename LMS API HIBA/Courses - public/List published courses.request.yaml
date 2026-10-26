@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/api/courses"
+method: GET
+queryParams:
+  - key: category
+    value: ""
+    disabled: true
+  - key: level
+    value: ""
+    disabled: true
+  - key: keyword
+    value: ""
+    disabled: true
+  - key: sort
+    value: -createdAt
+    disabled: true
+order: 1000

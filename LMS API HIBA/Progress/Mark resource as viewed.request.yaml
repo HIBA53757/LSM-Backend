@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/progress/resources/{{resourceId}}/complete"
+method: POST
+order: 1000

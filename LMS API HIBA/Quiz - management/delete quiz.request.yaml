@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{baseUrl}}/api/quizzes/{{quizId}}"
+method: DELETE
+body:
+  type: text
+  content: |-
+    {
+      "passingScore": 50,
+      "isActive": true
+    }
+order: 5000

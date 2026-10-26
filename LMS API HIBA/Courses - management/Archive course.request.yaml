@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/courses/{{courseId}}/archived"
+method: PATCH
+order: 5000

@@ -12,3 +12,16 @@ export async function sendWelcomeEmail(user) {
     html,
   });
 }
+
+export async function sendCourseEnrolledEmail(user, course) {
+  const html = await renderEmailTemplate("course-enrolled", {
+    name: user.name,
+    courseTitle: course.title,
+  });
+   
+  return sendEmail({
+    to: user.email,
+    subject: `Inscription confirmée : ${course.title}`,
+    html,
+  });
+}

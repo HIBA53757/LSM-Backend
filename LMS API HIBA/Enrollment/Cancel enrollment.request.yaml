@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/enrollments/{{enrollmentId}}/cancel"
+method: PATCH
+order: 3000
