@@ -1,0 +1,9 @@
+$kind: http-request
+name: get
+url: "{{URL}}/api/preferences/6ae0762c842a8615abd1de65"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokentTrainer}}"
+order: 2712
