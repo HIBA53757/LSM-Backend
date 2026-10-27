@@ -47,7 +47,11 @@ export async function getPersonalAttempsOnCourse(req, res, next) {
     const userId = req.user.id;
     const {course} = req;
 
-    const courses = await Enrollment.findOne({ learner: userId , cours: course.id})
+    const courses = await Enrollment.findOne({
+      learner: userId,
+      course: course._id,
+      status: "active",
+    })
       .populate({
         path: "course",
         select: "course",

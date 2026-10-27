@@ -1,15 +1,23 @@
 import app from "./app.js"
 import { connectDB } from "./config/database.js";
-import dotenv from "dotenv"
+import { config } from "dotenv";
+import listners from "./utils/listnerHandler.js";
 
-dotenv.config();
-const PORT = process.env.PORT || 3001;
+const backendPort = process.env.PORT
+const backendHost = process.env.HOST
 
 async function startServer() {
     try {
         await connectDB();
-        app.listen(PORT, () => {
-            console.log(`server running on http://localhost:${PORT}`);
+        app.listen(backendPort, backendHost, () => {``
+            console.log(`backend is running on HOST ${backendHost} and PORT ${backendPort}`)
+            console.log('---------------------------------')
+            console.log(`Listner Available:`)
+            console.log('---------------------------------')
+            listners.forEach(litsner => {
+                console.log(`${litsner.name} : ${litsner.adress}:${backendPort}`)
+            })
+            console.log('---------------------------------')
         });
     }
     catch (error) {
@@ -17,4 +25,4 @@ async function startServer() {
         process.exit(1)
     }
 }
-startServer();
+await startServer();
