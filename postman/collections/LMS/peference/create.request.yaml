@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{URL}}/api/preferences"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"subscribed\": true,\r
+
+    \  \"courses\": [\"6ad9f424aee90184a858bf49\" ,
+    \"6ad9f424aee90184a858bf4a\"],\r
+
+    \  \"frequency\": \"weekly\"\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokentTrainer}}"
+order: 4000
