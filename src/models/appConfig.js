@@ -10,7 +10,7 @@ const appConfigSchema = new mongoose.Schema(
 
     emailDriver: {
       type: String,
-      enum: ["log", "sandbox", "smtp"],
+      enum: ["log", "sandbox"],
       default: "log",
     },
 
