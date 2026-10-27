@@ -1,0 +1,18 @@
+$kind: http-request
+name: update
+url: "{{URL}}/api/preferences/6ae0762c842a8615abd1de65"
+method: PATCH
+body:
+  type: json
+  content: "{\r
+
+    \  \"subscribed\": true,\r
+
+    \  \"frequency\": \"weekly\"\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokentTrainer}}"
+order: 1000
