@@ -40,3 +40,24 @@ export async function sendPasswordResetEmail(user, resetUrl,resetToken) {
   });
 }
 
+export async function sendInactiveReminderEmail(
+  user,
+  course,
+  lastActivityDate,
+  driver
+) {
+  const html = await renderEmailTemplate("inactive-reminder", {
+    name: user.name,
+    course: course.title,
+    lastActivityDate: new Date(lastActivityDate).toLocaleDateString("fr-FR"),
+  });
+
+  return sendEmail({
+    to: user.email,
+    subject: `Rappel de votre apprentissage : ${course.title}`,
+    html,
+    driver,
+  });
+}
+
+
