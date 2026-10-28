@@ -1,0 +1,156 @@
+tags:
+  - name: Modules
+    description: Create, update, and publish course modules
+
+paths:
+  /api/modules/courses/{courseId}:
+    post:
+      summary: Create a module in a course
+      tags: [Modules]
+      description: Trainers can add modules to their own courses. Admins can add modules to any course. New modules start as drafts.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              title: Variables
+              description: Learn about JavaScript variables.
+              position: 1
+              estimatedDuration: 30
+      responses:
+        '201':
+          description: Module created as a draft.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Module created successfully
+                data:
+                  module:
+                    title: Variables
+                    description: Learn about JavaScript variables.
+                    position: 1
+                    estimatedDuration: 30
+                    status: draft
+        '400':
+          description: Module data or course ID is invalid.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can create modules, and trainers can only use their own courses.
+        '404':
+          description: Course not found.
+
+  /api/modules/{moduleId}:
+    put:
+      summary: Update a module
+      tags: [Modules]
+      description: Trainers can update their own modules. Admins can update any module. Send the fields you want to change.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: moduleId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012346
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              title: Variables and constants
+              estimatedDuration: 40
+      responses:
+        '200':
+          description: Module updated.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Module updated successfully
+                data:
+                  module:
+                    title: Variables and constants
+                    estimatedDuration: 40
+        '400':
+          description: Module data or module ID is invalid.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: You do not own this module and are not an admin.
+        '404':
+          description: Module not found.
+  /api/modules/{moduleId}/publish:
+    patch:
+      summary: Publish a module
+      tags: [Modules]
+      description: Trainers can publish their own modules. Admins can publish any module.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: moduleId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012346
+      responses:
+        '200':
+          description: Module published.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Module published successfully
+                data:
+                  module:
+                    status: published
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: You do not own this module and are not an admin.
+        '404':
+          description: Module not found.
+
+  /api/modules/{moduleId}/unpublish:
+    patch:
+      summary: Unpublish a module
+      tags: [Modules]
+      description: Changes the module status back to draft.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: moduleId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012346
+      responses:
+        '200':
+          description: Module unpublished and set to draft.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Module unpublished successfully
+                data:
+                  module:
+                    status: draft
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: You do not own this module and are not an admin.
+        '404':
+          description: Module not found.

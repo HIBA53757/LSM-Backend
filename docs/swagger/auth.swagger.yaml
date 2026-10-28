@@ -1,0 +1,109 @@
+tags:
+  - name: Authentication
+    description: Register, log in, and reset a password
+
+paths:
+  /api/auth/register:
+    post:
+      summary: Create a learner account
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              name: Samira Learner
+              email: samira@example.com
+              password: SecurePass123
+      responses:
+        '201':
+          description: Account created. The new account role is learner.
+          content:
+            application/json:
+              example:
+                success: true
+                message: User registered successfully
+                data:
+                  user:
+                    id: 672a1b2c3d4e5f6789012345
+                    name: Samira Learner
+                    email: samira@example.com
+                    role: learner
+        '400':
+          description: A required field is missing.
+        '409':
+          description: Email is already registered.
+
+  /api/auth/login:
+    post:
+      summary: Log in
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              email: samira@example.com
+              password: SecurePass123
+      responses:
+        '200':
+          description: Login successful. Copy the token for authenticated requests.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Logged in successfully
+                token: your-jwt-token
+                data:
+                  user:
+                    id: 672a1b2c3d4e5f6789012345
+                    name: Samira Learner
+                    email: samira@example.com
+                    role: learner
+        '400':
+          description: Email or password is missing or incorrect.
+
+  /api/auth/forgot-password:
+    post:
+      summary: Ask for a password reset link
+      description: The same message is returned whether or not the email belongs to an account.
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              email: samira@example.com
+      responses:
+        '200':
+          description: Request accepted.
+          content:
+            application/json:
+              example:
+                success: true
+                message: If an account exists with this email, a reset link will be sent.
+        '400':
+          description: Email is missing.
+
+  /api/auth/reset-password:
+    post:
+      summary: Set a new password
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              email: samira@example.com
+              token: reset-token-from-email
+              password: NewSecurePass123
+      responses:
+        '200':
+          description: Password changed successfully.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Password reset successfully.
+        '400':
+          description: A field is missing, the password is too short, or the token is invalid or expired.
