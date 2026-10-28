@@ -28,6 +28,6 @@ router.use("/feedback" , feedbackRoutes)
 router.use("/preferences" , trainerPreferenceRoutes)
 router.use("/quizzes", quizRoutes)
 router.use("/quiz/attempts", quizAttemptRoutes)
-router.use("/admin",adminConfigRoutes)
+router.use("/admin",adminConfigRoutes)  
 
 export default router
