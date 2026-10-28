@@ -177,7 +177,7 @@ export async function resetPassword(req, res, next) {
     const user = await User.findOne({
       email: email.trim().toLowerCase(),
       resetPasswordToken: hashedToken,
-      resetPasswordExpires: { $gt: new Date() },
+      resetPasswordExpires: { $gt: new Date() }, //gt operateur comparaison mongoose greater than
     });
 
     if (!user) {

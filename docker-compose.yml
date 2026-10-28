@@ -1,7 +1,7 @@
 services:
   mongodb:
     image: mongo:8
-    container_name: lms-mongodb-breif3
+    container_name: mongodb-8
     ports:
       - "27017:27017"
     volumes:
@@ -12,7 +12,7 @@ services:
     container_name: lms-api
     restart: always
     ports:
-      - "3000:3000"
+      - "${HOST}:${PORT}:${PORT}"
     env_file:
       - .docker.env
     depends_on:
