@@ -91,7 +91,6 @@ paths:
           description: You do not own this module and are not an admin.
         '404':
           description: Module not found.
-
   /api/modules/{moduleId}/publish:
     patch:
       summary: Publish a module
@@ -155,36 +154,3 @@ paths:
           description: You do not own this module and are not an admin.
         '404':
           description: Module not found.
-
-  /api/modules/{moduleId}/resources:
-    get:
-      summary: List resources in a module
-      tags: [Modules]
-      description: Requires a login token. Resources are returned in position order.
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: moduleId
-          required: true
-          schema:
-            type: string
-          example: 672a1b2c3d4e5f6789012346
-      responses:
-        '200':
-          description: Resources in the module.
-          content:
-            application/json:
-              example:
-                success: true
-                data:
-                  resources:
-                    - _id: 672a1b2c3d4e5f6789012347
-                      title: Variables overview
-                      type: article
-                      position: 1
-                      status: published
-        '401':
-          description: Missing, invalid, or expired login token.
-        '500':
-          description: Internal server error.
