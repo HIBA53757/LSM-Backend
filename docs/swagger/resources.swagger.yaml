@@ -1,0 +1,162 @@
+tags:
+  - name: Resources
+    description: Add, update, publish, and list module learning resources
+
+paths:
+  /api/modules/{moduleId}/resources:
+    get:
+      summary: List resources in a module
+      tags: [Resources]
+      description: Requires a login token. Results are sorted by position.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: moduleId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012346
+      responses:
+        '200':
+          description: Resources in the module.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  resources:
+                    - _id: 672a1b2c3d4e5f6789012347
+                      title: Variables overview
+                      type: article
+                      position: 1
+                      status: published
+        '401':
+          description: Missing, invalid, or expired login token.
+
+  /api/resources/modules/{moduleId}:
+    post:
+      summary: Create a resource in a module
+      tags: [Resources]
+      description: Trainers can add resources to their own modules. Admins can add resources to any module. New resources start as drafts. An optional file can be uploaded with the file field and must be no larger than 5 MB.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: moduleId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012346
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            example:
+              title: Variables overview
+              type: article
+              content: A short introduction to variables.
+              url: https://example.com/variables
+              description: Introductory reading
+              position: 1
+              file: variables.pdf
+      responses:
+        '201':
+          description: Resource created as a draft.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Resource created successfully
+                data:
+                  resource:
+                    title: Variables overview
+                    type: article
+                    content: A short introduction to variables.
+                    url: https://example.com/variables
+                    position: 1
+                    status: draft
+        '400':
+          description: Resource data or module ID is invalid.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can create resources, and trainers can only use their own modules.
+        '404':
+          description: Module or course not found.
+
+  /api/resources/{resourceId}:
+    put:
+      summary: Update a resource
+      tags: [Resources]
+      description: Trainers can update resources in their own courses. Admins can update any resource. Send only the fields you want to change.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012347
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              title: Variables — updated
+              description: Updated introductory reading
+              position: 2
+      responses:
+        '200':
+          description: Resource updated.
+          content:
+            application/json:
+              example:
+                success: true
+                message: resource updated
+                data:
+                  resource:
+                    title: Variables — updated
+                    description: Updated introductory reading
+                    position: 2
+        '400':
+          description: Resource data or resource ID is invalid.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: You do not own this resource and are not an admin.
+        '404':
+          description: Resource, module, or course not found.
+
+  /api/resources/{resourceId}/published:
+    patch:
+      summary: Publish a resource
+      tags: [Resources]
+      description: Trainers can publish resources in their own courses. Admins can publish any resource.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012347
+      responses:
+        '200':
+          description: Resource published.
+          content:
+            application/json:
+              example:
+                success: true
+                message: resource has been published
+                data:
+                  resource:
+                    status: published
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: You do not own this resource and are not an admin.
+        '404':
+          description: Resource, module, or course not found.

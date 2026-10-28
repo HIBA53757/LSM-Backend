@@ -1,0 +1,297 @@
+tags:
+  - name: Courses
+    description: Browse courses and manage trainer courses
+
+paths:
+  /api/courses:
+    get:
+      summary: List published courses
+      tags: [Courses]
+      description: Only published courses are returned.
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          example: Programming
+        - in: query
+          name: level
+          schema:
+            type: string
+            enum: [beginner, intermediate, advanced]
+          example: beginner
+        - in: query
+          name: keyword
+          schema:
+            type: string
+          description: Searches course title, description, and category.
+          example: JavaScript
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [createdAt, '-createdAt', publishedAt, '-publishedAt']
+          description: Sort field. Defaults to newest first.
+          example: '-createdAt'
+      responses:
+        '200':
+          description: List of published courses.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  courses:
+                    - _id: 672a1b2c3d4e5f6789012345
+                      title: JavaScript Fundamentals
+                      description: Learn JavaScript basics.
+                      objectives: [Understand variables, Write simple functions]
+                      level: beginner
+                      category: Programming
+                      estimatedDuration: 120
+                      status: published
+        '500':
+          description: Internal server error.
+
+    post:
+      summary: Create a course
+      tags: [Courses]
+      description: Trainers and admins can create courses. New courses start as drafts.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              title: JavaScript Fundamentals
+              description: Learn JavaScript basics.
+              objectives: [Understand variables, Write simple functions]
+              level: beginner
+              category: Programming
+              estimatedDuration: 120
+      responses:
+        '201':
+          description: Course created as a draft.
+          content:
+            application/json:
+              example:
+                success: true
+                message: course created successfully
+                data:
+                  course:
+                    title: JavaScript Fundamentals
+                    description: Learn JavaScript basics.
+                    objectives: [Understand variables, Write simple functions]
+                    level: beginner
+                    category: Programming
+                    estimatedDuration: 120
+                    status: draft
+        '400':
+          description: Course data is invalid or required fields are missing.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can create courses.
+
+  /api/courses/{id}:
+    get:
+      summary: Get a published course
+      tags: [Courses]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      responses:
+        '200':
+          description: Course details.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  course:
+                    _id: 672a1b2c3d4e5f6789012345
+                    title: JavaScript Fundamentals
+                    description: Learn JavaScript basics.
+                    objectives: [Understand variables, Write simple functions]
+                    level: beginner
+                    category: Programming
+                    estimatedDuration: 120
+                    status: published
+        '400':
+          description: Invalid course ID.
+        '404':
+          description: Course not found or not published.
+
+    patch:
+      summary: Update a course
+      tags: [Courses]
+      description: Trainers can update their own courses. Admins can update any course. Send only fields to change.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              title: JavaScript Fundamentals — Updated
+              estimatedDuration: 150
+      responses:
+        '200':
+          description: Course updated.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Course updated successfully
+                data:
+                  course:
+                    title: JavaScript Fundamentals — Updated
+                    estimatedDuration: 150
+        '400':
+          description: Invalid course data or course ID.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: You do not own this course and are not an admin.
+        '404':
+          description: Course not found.
+
+  /api/courses/{id}/publish:
+    patch:
+      summary: Publish a course
+      tags: [Courses]
+      description: Trainers can publish their own courses. Admins can publish any course.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      responses:
+        '200':
+          description: Course published.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Course published successfully
+                data:
+                  course:
+                    status: published
+                    publishedAt: '2026-10-28T14:00:00.000Z'
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: You do not own this course and are not an admin.
+        '404':
+          description: Course not found.
+
+  /api/courses/{id}/unpublish:
+    patch:
+      summary: Unpublish a course
+      tags: [Courses]
+      description: Changes the course status back to draft.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      responses:
+        '200':
+          description: Course unpublished and set to draft.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Course unpublished successfully
+                data:
+                  course:
+                    status: draft
+                    publishedAt: null
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: You do not own this course and are not an admin.
+        '404':
+          description: Course not found.
+
+  /api/courses/{id}/archived:
+    patch:
+      summary: Archive a course
+      tags: [Courses]
+      description: Trainers can archive their own courses. Admins can archive any course.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      responses:
+        '200':
+          description: Course archived.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Course archived successfully
+                data:
+                  course:
+                    status: archived
+                    publishedAt: null
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: You do not own this course and are not an admin.
+        '404':
+          description: Course not found.
+
+  /api/courses/{courseId}/modules:
+    get:
+      summary: List published modules in a course
+      tags: [Courses]
+      description: Modules are returned in position order.
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      responses:
+        '200':
+          description: Published modules for this course.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  modules:
+                    - _id: 672a1b2c3d4e5f6789012346
+                      title: Variables
+                      description: Learn about variables.
+                      position: 1
+                      status: published
+        '400':
+          description: Invalid course ID.
