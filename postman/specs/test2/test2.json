@@ -1,0 +1,942 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "test2",
+    "version": "1.0.0",
+    "description": "Complete LMS API collection. Set the collection variables before running requests. Login stores the JWT in the token variable."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "API health check",
+        "responses": {},
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register learner",
+        "responses": {},
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "name": "Learner User",
+                "email": "learner@example.com",
+                "password": "password123"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Login",
+        "responses": {},
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "email": "learner@example.com",
+                "password": "password123"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/": {
+      "get": {
+        "summary": "Get published course",
+        "responses": {},
+        "tags": [
+          "Courses - public"
+        ]
+      }
+    },
+    "/api/courses/{courseId}/modules": {
+      "get": {
+        "summary": "List course modules",
+        "responses": {},
+        "tags": [
+          "Courses - public"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/courses": {
+      "post": {
+        "summary": "Create course",
+        "responses": {},
+        "tags": [
+          "Courses - management"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "objectives": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "level": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "estimatedDuration": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "title": "JavaScript Fundamentals",
+                "description": "Learn JavaScript basics",
+                "objectives": [
+                  "Variables",
+                  "Functions",
+                  "Objects"
+                ],
+                "level": "beginner",
+                "category": "Programming",
+                "estimatedDuration": 30
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/courses/{courseId}": {
+      "patch": {
+        "summary": "Update course",
+        "responses": {},
+        "tags": [
+          "Courses - management"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "estimatedDuration": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "title": "Updated course title",
+                "estimatedDuration": 35
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/courses/{courseId}/publish": {
+      "patch": {
+        "summary": "Publish course",
+        "responses": {},
+        "tags": [
+          "Courses - management"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/courses/{courseId}/unpublish": {
+      "patch": {
+        "summary": "Unpublish course",
+        "responses": {},
+        "tags": [
+          "Courses - management"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/courses/{courseId}/archived": {
+      "patch": {
+        "summary": "Archive course",
+        "responses": {},
+        "tags": [
+          "Courses - management"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/enrollments/courses/{courseId}/enroll": {
+      "post": {
+        "summary": "Enroll in course",
+        "responses": {},
+        "tags": [
+          "Enrollment"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/enrollments/me/": {
+      "get": {
+        "summary": "Get my enrollments",
+        "responses": {},
+        "tags": [
+          "Enrollment"
+        ]
+      }
+    },
+    "/api/enrollments/{enrollmentId}/cancel": {
+      "patch": {
+        "summary": "Cancel enrollment",
+        "responses": {},
+        "tags": [
+          "Enrollment"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "enrollmentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/modules/courses/{courseId}": {
+      "post": {
+        "summary": "Create module",
+        "responses": {},
+        "tags": [
+          "Modules - management"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "integer"
+                  },
+                  "estimatedDuration": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "title": "Introduction",
+                "description": "Course introduction",
+                "position": 1,
+                "estimatedDuration": 20
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/modules/{moduleId}": {
+      "put": {
+        "summary": "Update module",
+        "responses": {},
+        "tags": [
+          "Modules - management"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "estimatedDuration": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "title": "Updated module title",
+                "estimatedDuration": 25
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "moduleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/modules/{moduleId}/publish": {
+      "patch": {
+        "summary": "Publish module",
+        "responses": {},
+        "tags": [
+          "Modules - management"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "moduleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/modules/{moduleId}/unpublish": {
+      "patch": {
+        "summary": "Unpublish module",
+        "responses": {},
+        "tags": [
+          "Modules - management"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "moduleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/modules/{moduleId}/resources": {
+      "get": {
+        "summary": "List module resources",
+        "responses": {},
+        "tags": [
+          "Resources"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "moduleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/resources/courses/{courseId}/modules/{moduleId}/resources": {
+      "post": {
+        "summary": "Create resource",
+        "responses": {},
+        "tags": [
+          "Resources"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        },
+        {
+          "name": "moduleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/resources/{courseId}/{moduleId}/resources/{resourceId}": {
+      "patch": {
+        "summary": "Update resource",
+        "responses": {},
+        "tags": [
+          "Resources"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "title": "Updated resource",
+                "description": "Updated description",
+                "position": 1
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        },
+        {
+          "name": "moduleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        },
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/resources/{courseId}/{moduleId}/{resourceId}/published": {
+      "patch": {
+        "summary": "Publish resource",
+        "responses": {},
+        "tags": [
+          "Resources"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        },
+        {
+          "name": "moduleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        },
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/progress/resources/{resourceId}/complete": {
+      "post": {
+        "summary": "Mark resource as viewed",
+        "responses": {},
+        "tags": [
+          "Progress"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/progress/modules/{moduleId}/complete": {
+      "post": {
+        "summary": "Complete module",
+        "responses": {},
+        "tags": [
+          "Progress"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "moduleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/progress/courses/{courseId}/progression": {
+      "get": {
+        "summary": "Get course progression",
+        "responses": {},
+        "tags": [
+          "Progress"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/progress/resources/{resourceId}/view": {
+      "get": {
+        "summary": "resume Resource",
+        "responses": {},
+        "tags": [
+          "Progress"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "resourceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/trainer/Courses": {
+      "get": {
+        "summary": "Get trainer courses",
+        "responses": {},
+        "tags": [
+          "Trainer and admin"
+        ]
+      }
+    },
+    "/api/trainer/courses/{courseId}/learners": {
+      "get": {
+        "summary": "Get course learners",
+        "responses": {},
+        "tags": [
+          "Trainer and admin"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/profiles/me": {
+      "get": {
+        "summary": "get Profile",
+        "responses": {},
+        "tags": [
+          "Profile"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/quizzes/modules/{moduleId}": {
+      "get": {
+        "summary": "get quiz on Module",
+        "responses": {},
+        "tags": [
+          "Quiz - management"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "moduleId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    },
+    "/api/quizzes/{quizId}": {
+      "get": {
+        "summary": "get quiz by id",
+        "responses": {},
+        "tags": [
+          "Quiz - management"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "quizId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ],
+      "patch": {
+        "summary": "update quiz",
+        "responses": {},
+        "tags": [
+          "Quiz - management"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "passingScore": {
+                    "type": "integer"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "passingScore": 50,
+                "isActive": true
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "delete quiz",
+        "responses": {},
+        "tags": [
+          "Quiz - management"
+        ]
+      }
+    },
+    "/api/quizzes": {
+      "post": {
+        "summary": "create quiz",
+        "responses": {},
+        "tags": [
+          "Quiz - management"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "module": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "questions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "text": {
+                          "type": "string"
+                        },
+                        "choices": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "number": {
+                                "type": "integer"
+                              },
+                              "text": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "correctAnswer": {
+                          "type": "integer"
+                        },
+                        "points": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "passingScore": {
+                    "type": "integer"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "module": "6ad8d75855118298aa76ec46",
+                "title": "JavaScript Basics Quiz",
+                "questions": [
+                  {
+                    "text": "Which keyword declares a constant in JavaScript?",
+                    "choices": [
+                      {
+                        "number": 1,
+                        "text": "var"
+                      },
+                      {
+                        "number": 2,
+                        "text": "const"
+                      },
+                      {
+                        "number": 3,
+                        "text": "let"
+                      }
+                    ],
+                    "correctAnswer": 2,
+                    "points": 5
+                  },
+                  {
+                    "text": "Which value represents true or false?",
+                    "choices": [
+                      {
+                        "number": 1,
+                        "text": "Boolean"
+                      },
+                      {
+                        "number": 2,
+                        "text": "String"
+                      }
+                    ],
+                    "correctAnswer": 1,
+                    "points": 5
+                  }
+                ],
+                "passingScore": 7,
+                "isActive": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz/attempts/me": {
+      "get": {
+        "summary": "get my attempts",
+        "responses": {},
+        "tags": [
+          "quiz attemps"
+        ]
+      }
+    },
+    "/api/quiz/attempts/me/courses/{courseId}": {
+      "get": {
+        "summary": "get my attempts by course",
+        "responses": {},
+        "tags": [
+          "quiz attemps"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "courseId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": ""
+        }
+      ]
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
