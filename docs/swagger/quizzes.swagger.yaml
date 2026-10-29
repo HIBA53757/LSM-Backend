@@ -1,0 +1,313 @@
+tags:
+  - name: Quizzes
+    description: Create and manage quizzes, and let enrolled learners take them
+
+paths:
+  /api/quizzes/modules/{moduleId}:
+    get:
+      summary: List quizzes for a module
+      tags: [Quizzes]
+      description: Trainers can list quizzes for modules they own; admins can list quizzes for any module.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: moduleId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012346
+      responses:
+        '200':
+          description: Quizzes in the module, newest first.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  quizzes:
+                    - _id: 672a1b2c3d4e5f6789012351
+                      module: 672a1b2c3d4e5f6789012346
+                      title: JavaScript Basics Quiz
+                      questions:
+                        - _id: 672a1b2c3d4e5f6789012352
+                          text: Which keyword declares a constant in JavaScript?
+                          choices:
+                            - number: 1
+                              text: var
+                            - number: 2
+                              text: const
+                          correctAnswer: 2
+                          points: 5
+                      passingScore: 4
+                      isActive: true
+                      isRequired: false
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can list quizzes; trainers must own the module.
+        '404':
+          description: Module was not found.
+
+  /api/quizzes/{quizId}/view:
+    get:
+      summary: View an active quiz as a learner
+      tags: [Quizzes]
+      description: Requires an active enrollment in the course. The learner must complete prior modules and view all resources in the quiz's module. Correct answers are omitted from the response; a learner who has already passed cannot retake the quiz.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: quizId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012351
+      responses:
+        '200':
+          description: Quiz questions and choices without the answer key.
+          content:
+            application/json:
+              example:
+                success: true
+                message: quiz fetched successfuly
+                data:
+                  quiz:
+                    _id: 672a1b2c3d4e5f6789012351
+                    title: JavaScript Basics Quiz
+                    questions:
+                      - _id: 672a1b2c3d4e5f6789012352
+                        text: Which keyword declares a constant in JavaScript?
+                        choices:
+                          - number: 1
+                            text: var
+                          - number: 2
+                            text: const
+                        points: 5
+                    passingScore: 4
+                    isActive: true
+                    isRequired: false
+        '400':
+          description: Module progression or resource-view requirements are incomplete.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Active course enrollment is required.
+        '404':
+          description: Quiz, module, or course is not available.
+        '409':
+          description: Learner has already passed this quiz.
+
+  /api/quizzes/submit:
+    post:
+      summary: Submit answers to a quiz
+      tags: [Quizzes]
+      description: Learners must be actively enrolled, have completed the module's resources and prior modules, and submit one valid answer for every question. The backend calculates the score and pass result.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              quiz: 672a1b2c3d4e5f6789012351
+              answers:
+                - questionId: 672a1b2c3d4e5f6789012352
+                  selectedChoice: 2
+      responses:
+        '200':
+          description: Answers accepted and score calculated.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  cleanReport:
+                    questionResults:
+                      - question: 672a1b2c3d4e5f6789012352
+                        selectedChoice: 2
+                    score: 5
+                    success: true
+        '400':
+          description: Request validation failed, answers are incomplete or invalid, or progression requirements are unmet.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Active course enrollment is required.
+        '404':
+          description: Quiz, module, or course is not available.
+        '409':
+          description: Learner has already passed this quiz.
+
+  /api/quizzes:
+    post:
+      summary: Create a quiz for a module
+      tags: [Quizzes]
+      description: Trainers can create quizzes for modules they own; admins can create quizzes for any module. Only one quiz is allowed per module. New quizzes default to inactive and optional.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              module: 672a1b2c3d4e5f6789012346
+              title: JavaScript Basics Quiz
+              questions:
+                - text: Which keyword declares a constant in JavaScript?
+                  choices:
+                    - number: 1
+                      text: var
+                    - number: 2
+                      text: const
+                  correctAnswer: 2
+                  points: 5
+              passingScore: 4
+              isActive: false
+              isRequired: false
+      responses:
+        '201':
+          description: Quiz created.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Quiz created successfully
+                data:
+                  quiz:
+                    _id: 672a1b2c3d4e5f6789012351
+                    module: 672a1b2c3d4e5f6789012346
+                    title: JavaScript Basics Quiz
+                    passingScore: 4
+                    isActive: false
+                    isRequired: false
+        '400':
+          description: Quiz data failed validation.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can create quizzes; trainers must own the module.
+        '404':
+          description: Module was not found.
+        '409':
+          description: A quiz already exists for this module.
+
+  /api/quizzes/{quizId}:
+    get:
+      summary: Get quiz details for its trainer
+      tags: [Quizzes]
+      description: Returns the full quiz, including correct answers. Restricted to the owning trainer or an admin; do not use this endpoint for learner quiz display.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: quizId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012351
+      responses:
+        '200':
+          description: Full quiz details.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  quiz:
+                    _id: 672a1b2c3d4e5f6789012351
+                    title: JavaScript Basics Quiz
+                    questions:
+                      - text: Which keyword declares a constant in JavaScript?
+                        choices:
+                          - number: 1
+                            text: var
+                          - number: 2
+                            text: const
+                        correctAnswer: 2
+                        points: 5
+                    passingScore: 4
+                    isActive: true
+                    isRequired: false
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can access this endpoint; trainers must own the quiz.
+        '404':
+          description: Quiz, module, or course was not found.
+
+    patch:
+      summary: Update a quiz
+      tags: [Quizzes]
+      description: Trainers can update quizzes in their own courses; admins can update any quiz. Send at least one supported field.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: quizId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012351
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              title: JavaScript Basics Quiz - Updated
+              passingScore: 5
+              isActive: true
+              isRequired: true
+      responses:
+        '200':
+          description: Quiz updated.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Quiz updated successfully
+                data:
+                  quiz:
+                    _id: 672a1b2c3d4e5f6789012351
+                    title: JavaScript Basics Quiz - Updated
+                    passingScore: 5
+                    isActive: true
+                    isRequired: true
+        '400':
+          description: No fields supplied or quiz data failed validation.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can update quizzes; trainers must own the quiz.
+        '404':
+          description: Quiz, module, or course was not found.
+
+    delete:
+      summary: Delete a quiz
+      tags: [Quizzes]
+      description: Trainers can delete quizzes in their own courses; admins can delete any quiz. A quiz with attempts cannot be deleted.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: quizId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012351
+      responses:
+        '200':
+          description: Quiz deleted.
+          content:
+            application/json:
+              example:
+                success: true
+                message: Quiz deleted successfully
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can delete quizzes; trainers must own the quiz.
+        '404':
+          description: Quiz, module, or course was not found.
+        '409':
+          description: Quiz has attempts and cannot be deleted.
