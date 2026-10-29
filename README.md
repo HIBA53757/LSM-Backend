@@ -190,3 +190,29 @@ src/
  seed/           Database seed script
  docs/           Project diagrams and progression notes
 ```
+
+## Contrat React
+
+### Statistiques du formateur
+
+**Endpoint :** `GET /api/trainer/statistics`  
+**Authentification :** token Bearer obligatoire. Réservé au rôle `trainer`.  
+**Résultat :** les statistiques portent uniquement sur les cours du formateur authentifié.
+
+**Réponse `200` :**
+
+```json
+{
+  "success": true,
+  "data": {
+    "coursesCount": 1,
+    "courses": [
+      {
+        "courseId": "64f000000000000000000001",
+        "courseTitle": "JavaScript",
+        "enrolledLearnersCount": 12,
+        "averageProgress": 48
+      }
+    ]
+  }
+}
