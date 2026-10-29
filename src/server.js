@@ -1,7 +1,7 @@
 import app from "./app.js"
 import { connectDB } from "./config/database.js";
-import { config } from "dotenv";
 import listners from "./utils/listnerHandler.js";
+import {startScheduler} from "./jobs/scheduler.js"
 
 const backendPort = process.env.PORT
 const backendHost = process.env.HOST
@@ -9,6 +9,7 @@ const backendHost = process.env.HOST
 async function startServer() {
     try {
         await connectDB();
+        await startScheduler();
         app.listen(backendPort, backendHost, () => {``
             console.log(`backend is running on HOST ${backendHost} and PORT ${backendPort}`)
             console.log('---------------------------------')
@@ -25,4 +26,5 @@ async function startServer() {
         process.exit(1)
     }
 }
+
 await startServer();
