@@ -1,0 +1,135 @@
+tags:
+  - name: Quiz Attempts
+    description: Learner quiz results and trainer access to course attempts
+
+paths:
+  /api/quiz/attempts/me:
+    get:
+      summary: Get the current learner's quiz attempts
+      tags: [Quiz Attempts]
+      description: Returns the learner's enrolled courses with active quizzes and attempts associated with the learner.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Courses and the learner's quiz attempt data.
+          content:
+            application/json:
+              example:
+                success: true
+                message: quiz Attemps fetched successfuly
+                data:
+                  courses: []
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only learners can access this endpoint.
+
+  /api/quiz/attempts/me/courses/{courseId}:
+    get:
+      summary: Get the current learner's quiz attempts for a course
+      tags: [Quiz Attempts]
+      description: Requires an active enrollment in the requested course. Returns active quizzes and attempts for the authenticated learner.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      responses:
+        '200':
+          description: The learner's attempts for the course.
+          content:
+            application/json:
+              example:
+                success: true
+                message: quiz Attemps fetched successfuly
+                data:
+                  courses:
+                    _id: 672a1b2c3d4e5f6789012350
+                    learner: 672a1b2c3d4e5f6789012349
+                    course:
+                      _id: 672a1b2c3d4e5f6789012345
+                      title: JavaScript Fundamentals
+                      modules: []
+                    status: active
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only learners with an active enrollment can access this endpoint.
+        '404':
+          description: Course was not found or is not published.
+
+  /api/quiz/attempts:
+    get:
+      summary: Get quiz attempts across trainer courses
+      tags: [Quiz Attempts]
+      description: Trainers receive results for their courses; admins receive results across courses. Results are associated with enrolled learners.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Courses, enrollments, and learner quiz attempts.
+          content:
+            application/json:
+              example:
+                success: true
+                message: quiz Attemps fetched successfuly
+                data:
+                  courses:
+                    - _id: 672a1b2c3d4e5f6789012345
+                      title: JavaScript Fundamentals
+                      enrollments:
+                        - learner:
+                            _id: 672a1b2c3d4e5f6789012349
+                            name: Samira Learner
+                            email: samira@example.com
+                          quizAttempts:
+                            - _id: 672a1b2c3d4e5f6789012353
+                              quiz: 672a1b2c3d4e5f6789012351
+                              learner: 672a1b2c3d4e5f6789012349
+                              score: 5
+                              passed: true
+                              status: submitted
+                              submittedAt: '2026-10-28T12:30:00.000Z'
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can access this endpoint.
+
+  /api/quiz/attempts/courses/{courseId}:
+    get:
+      summary: Get learner quiz attempts for a course
+      tags: [Quiz Attempts]
+      description: Trainers can view results for courses they own; admins can view results for any course.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      responses:
+        '200':
+          description: Course enrollments with each learner's quiz attempts.
+          content:
+            application/json:
+              example:
+                success: true
+                message: quiz Attemps fetched successfuly
+                data:
+                  courses:
+                    - _id: 672a1b2c3d4e5f6789012345
+                      title: JavaScript Fundamentals
+                      enrollments: []
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can access this endpoint; trainers must own the course.
+        '404':
+          description: Course was not found.
