@@ -21,7 +21,7 @@ describe("inactiveReminder job", () => {
     let progress;
 
     beforeAll(async () => {
-        process.env.EMAIL_DRIVER = "log";
+        process.env.EMAIL_DRIVER = "sandbox";
         await connectDB();
     });
 
@@ -77,7 +77,7 @@ describe("inactiveReminder job", () => {
 
         await AppConfig.create({
             emailsEnabled: true,
-            emailDriver: "log",
+            emailDriver: "sandbox",
             inactiveDays: 7,
             inactiveReminderFrequency: "0 9 * * *",
             trainerSummaryFrequency: "0 8 * * 1",
