@@ -74,6 +74,133 @@ MongoDB data is stored in the `mongodb_data` Docker volume.
 
 Use a private `JWT_SECRET` and real SMTP credentials only in your local environment; do not commit secrets.
 
+## React integration contract
+
+The frontend should treat the API response envelope and the role attached to the JWT as the source of truth. The API does not issue a token during registration; call login after registration. Send the login token on protected requests as `Authorization: Bearer <token>` and keep it out of URLs and logs.
+
+### Base URL and accounts by environment
+
+| Environment | API base URL | Database / account setup |
+| --- | --- | --- |
+| Local development | `http://localhost:3000` (or the configured `PORT`) | Use the local `.env` database. `POST /api/auth/register` creates a learner account. To exercise trainer/admin screens, first register a development account, then change its `role` in the local MongoDB `users` collection to `trainer` or `admin`. |
+| Docker Compose | `http://localhost:3001` with the supplied `.docker.env.example` (or the configured host port) | Register through the mapped API URL. For trainer/admin demo accounts, change the role of a registered account in the Compose MongoDB database. Do not use production credentials or data for demos. |
+| Automated tests | Set `MONGO_URI` to a dedicated test database before running `npm test`. | Most integration tests create their own fixtures. `tests/feedback.test.js` also reads `TEST_ADMIN_EMAIL` and `TEST_ADMIN_PASSWORD` and expects that admin account to exist in the database it connects to. `MONGO_URI_TEST` is currently used by `tests/adminConfig.test.js`; it does not configure the whole suite. |
+
+Registration only creates learner accounts. The current API has no public endpoint for creating trainer/admin accounts and the seed script does not create demo users, so those accounts must be provisioned separately in non-production data. Keep environment-specific passwords and JWT secrets outside the repository.
+
+### Authentication
+
+Register a learner with `POST /api/auth/register`:
+
+```json
+{
+  "name": "Samira Learner",
+  "email": "samira@example.com",
+  "password": "<password>"
+}
+```
+
+The response is `201 Created` and contains the created user, but no token:
+
+```json
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "user": {
+      "name": "Samira Learner",
+      "id": "<userId>",
+      "email": "samira@example.com",
+      "role": "learner"
+    }
+  }
+}
+```
+
+Then call `POST /api/auth/login` with the same email and password. Save `token` from the response and send it as a bearer token for protected calls. The login response user has `name`, `id`, `email`, and `role` fields.
+
+```http
+Authorization: Bearer <token>
+```
+
+### Course catalog and enrollment
+
+The catalog is public. `GET /api/courses` returns `{ "success": true, "data": { "courses": [...] } }`; each course includes its published course fields such as `_id`, `title`, `description`, `objectives`, `level`, `category`, `estimatedDuration`, `status`, `publishedAt`, and `trainer`. Optional query parameters are `category`, `level`, `keyword`, and `sort` (`createdAt`, `-createdAt`, `publishedAt`, or `-publishedAt`).
+
+Use `GET /api/courses/:courseId` for one published course and `GET /api/courses/:courseId/modules` for its modules. An authenticated learner enrolls with `POST /api/enrollments/courses/:courseId/enroll`; the response puts the created enrollment at `data.enrollment`. `GET /api/enrollments/me` returns the learner's enrollments at `data.enrollments`.
+
+### Learner progression
+
+Progress is learner-specific and requires an active enrollment. The current progression routes are:
+
+1. `GET /api/progress/resources/:resourceId/view` retrieves an accessible resource and creates the learner's initial progress record if needed. Its response is `{ "success": true, "data": { "resource": ... } }`.
+2. After the learner views it, `POST /api/progress/resources/:resourceId/complete` records it in progress. The response includes `data.progress`.
+3. `POST /api/progress/modules/:moduleId/complete` completes the module after its resources, any required quiz, and the previous module satisfy the backend rules.
+4. `GET /api/progress/courses/:courseId` returns the saved course progress.
+
+The course progress response has this shape:
+
+```json
+{
+  "success": true,
+  "data": {
+    "courseId": "<courseId>",
+    "percent": 50,
+    "completedResourcesCount": 2,
+    "modules": [
+      {
+        "id": "<moduleId>",
+        "title": "Module title",
+        "position": 1,
+        "status": "done"
+      },
+      {
+        "id": "<nextModuleId>",
+        "title": "Next module",
+        "position": 2,
+        "status": "accessible"
+      }
+    ]
+  }
+}
+```
+
+Module `status` values are `accessible`, `locked`, `in progress`, and `done`. The progress endpoint returns `404` until a progress record has been created through the resource view flow.
+
+### Trainer statistics
+
+`GET /api/trainer/statistics` requires a trainer bearer token. It returns one aggregate per course owned by that trainer:
+
+```json
+{
+  "success": true,
+  "data": {
+    "coursesCount": 1,
+    "courses": [
+      {
+        "courseId": "<courseId>",
+        "courseTitle": "JavaScript Fundamentals",
+        "enrolledLearnersCount": 12,
+        "averageProgress": 45
+      }
+    ]
+  }
+}
+```
+
+`enrolledLearnersCount` counts active and completed enrollments. `averageProgress` is the rounded average percentage for enrolled learners who have started progress; it is `0` when there are no started progress records. `coursesCount` is the number of trainer-owned courses returned by the aggregation.
+
+### Error responses
+
+Errors handled by the shared middleware use this response shape; React can display `message` and use the HTTP status for handling authentication, access, validation, and missing-resource cases:
+
+```json
+{
+  "success": false,
+  "message": "Previous module must be completed first"
+}
+```
+
 ## API overview
 
 All API routes are mounted under `/api`. Protected routes require a bearer token and enforce the role shown in the route definitions.
