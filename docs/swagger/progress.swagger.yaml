@@ -1,0 +1,169 @@
+tags:
+  - name: Progress
+    description: Track learner resource activity and course module completion
+
+paths:
+  /api/progress/courses/{courseId}:
+    get:
+      summary: Get course progression
+      tags: [Progress]
+      description: Returns the authenticated learner's completion percentage, completed resource count, and ordered module statuses. The learner must have an active enrollment and an existing progress record.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      responses:
+        '200':
+          description: Course progression data.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  courseId: 672a1b2c3d4e5f6789012345
+                  percent: 50
+                  completedResourcesCount: 1
+                  modules:
+                    - id: 672a1b2c3d4e5f6789012346
+                      title: JavaScript Basics
+                      position: 1
+                      status: in progress
+                    - id: 672a1b2c3d4e5f6789012347
+                      title: Functions and Arrays
+                      position: 2
+                      status: locked
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only learners with an active enrollment can access this endpoint.
+        '404':
+          description: Course or progress record was not found.
+
+  /api/progress/resources/{resourceId}/view:
+    get:
+      summary: View a course resource
+      tags: [Progress]
+      description: Returns a published resource for an actively enrolled learner. Creates an initial progress record when needed. Resources in later modules remain unavailable until the previous module is completed.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012348
+      responses:
+        '200':
+          description: Resource available to the learner.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  resource:
+                    _id: 672a1b2c3d4e5f6789012348
+                    title: JavaScript Variables PDF
+                    type: pdf
+                    status: published
+                    module: 672a1b2c3d4e5f6789012346
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Active enrollment is required, or the previous module must be completed first.
+        '404':
+          description: Resource, module, or course is not found or not published.
+
+  /api/progress/resources/{resourceId}/complete:
+    post:
+      summary: Mark a resource as viewed
+      tags: [Progress]
+      description: Adds the published resource to the learner's completed resources. The learner must already have a progress record; opening a resource through the view endpoint creates that record when needed. Repeating the request does not add a duplicate resource ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012348
+      responses:
+        '200':
+          description: Resource marked as viewed and progress returned.
+          content:
+            application/json:
+              example:
+                message: Resource marked as viewed
+                data:
+                  progress:
+                    learner: 672a1b2c3d4e5f6789012349
+                    course: 672a1b2c3d4e5f6789012345
+                    completedResources:
+                      - 672a1b2c3d4e5f6789012348
+                    completedModules: []
+                    percent: 0
+        '400':
+          description: Progress record does not exist; open a resource first to start course progress.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Active enrollment is required.
+        '404':
+          description: Resource, module, or course is not found or not published.
+
+  /api/progress/modules/{moduleId}/complete:
+    post:
+      summary: Complete a course module
+      tags: [Progress]
+      description: Marks a module complete after all its resources have been viewed, the previous module is complete, and any required quiz has a passed submitted attempt. Progress percentage is recalculated from completed modules.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: moduleId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012346
+      responses:
+        '200':
+          description: Module completed, or was already completed.
+          content:
+            application/json:
+              examples:
+                completed:
+                  value:
+                    seccess: true
+                    message: Module completed successfully
+                    data:
+                      progress:
+                        learner: 672a1b2c3d4e5f6789012349
+                        course: 672a1b2c3d4e5f6789012345
+                        completedResources:
+                          - 672a1b2c3d4e5f6789012348
+                        completedModules:
+                          - 672a1b2c3d4e5f6789012346
+                        percent: 50
+                alreadyCompleted:
+                  value:
+                    success: true
+                    message: Module already completed
+                    data:
+                      progress:
+                        completedModules:
+                          - 672a1b2c3d4e5f6789012346
+                        percent: 50
+        '400':
+          description: Progress has not started, the previous module is incomplete, resources remain unviewed, or a required quiz has not been passed.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Active course enrollment is required.
+        '404':
+          description: Module or its course is not found or not published.
