@@ -1,0 +1,166 @@
+tags:
+  - name: Feedback
+    description: Trainer feedback on learner course progress
+
+paths:
+  /api/feedback:
+    post:
+      summary: Create feedback for a learner's course progress
+      tags: [Feedback]
+      description: Trainers can create feedback for learners on their own courses; admins can create feedback for any course. The learner, course, and matching progress record must exist.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              learner: 672a1b2c3d4e5f6789012349
+              course: 672a1b2c3d4e5f6789012345
+              progress: 672a1b2c3d4e5f6789012354
+              message: Good progress on the course. Keep practicing JavaScript functions.
+              rating: 4
+      responses:
+        '201':
+          description: Feedback created.
+          content:
+            application/json:
+              example:
+                message: Feedback created successfully.
+                feedback:
+                  _id: 672a1b2c3d4e5f6789012355
+                  trainer: 672a1b2c3d4e5f6789012348
+                  learner: 672a1b2c3d4e5f6789012349
+                  course: 672a1b2c3d4e5f6789012345
+                  progress: 672a1b2c3d4e5f6789012354
+                  message: Good progress on the course. Keep practicing JavaScript functions.
+                  rating: 4
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can create feedback; trainers must own the course.
+        '404':
+          description: Learner, course, or matching progress record was not found.
+
+    get:
+      summary: List all feedback
+      tags: [Feedback]
+      description: Admin-only endpoint. Returns feedback with trainer, learner, course, and progress populated.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All feedback records.
+          content:
+            application/json:
+              example:
+                feedbacks:
+                  - _id: 672a1b2c3d4e5f6789012355
+                    trainer:
+                      _id: 672a1b2c3d4e5f6789012348
+                      name: Trainer Name
+                      email: trainer@example.com
+                    learner:
+                      _id: 672a1b2c3d4e5f6789012349
+                      name: Samira Learner
+                      email: samira@example.com
+                    course: 672a1b2c3d4e5f6789012345
+                    progress: 672a1b2c3d4e5f6789012354
+                    message: Good progress on the course.
+                    rating: 4
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only admins can list all feedback.
+
+  /api/feedback/me:
+    get:
+      summary: Get the current learner's feedback
+      tags: [Feedback]
+      description: Returns feedback records associated with the authenticated learner.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Feedback records for the learner.
+          content:
+            application/json:
+              example:
+                feedbacks:
+                  - _id: 672a1b2c3d4e5f6789012355
+                    trainer: 672a1b2c3d4e5f6789012348
+                    learner: 672a1b2c3d4e5f6789012349
+                    course: 672a1b2c3d4e5f6789012345
+                    progress: 672a1b2c3d4e5f6789012354
+                    message: Good progress on the course.
+                    rating: 4
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only learners can access this endpoint.
+
+  /api/feedback/{id}:
+    put:
+      summary: Update feedback
+      tags: [Feedback]
+      description: The trainer who created the feedback or an admin can update its message and rating.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012355
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              message: Updated feedback after reviewing the learner's latest progress.
+              rating: 5
+      responses:
+        '200':
+          description: Feedback updated.
+          content:
+            application/json:
+              example:
+                message: Feedback updated successfully
+                feedback:
+                  _id: 672a1b2c3d4e5f6789012355
+                  message: Updated feedback after reviewing the learner's latest progress.
+                  rating: 5
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can update feedback; trainers must own it.
+        '404':
+          description: Feedback was not found.
+
+    delete:
+      summary: Delete feedback
+      tags: [Feedback]
+      description: The trainer who created the feedback or an admin can delete it.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012355
+      responses:
+        '200':
+          description: Feedback deleted.
+          content:
+            application/json:
+              example:
+                message: Feedback deleted successfully
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can delete feedback; trainers must own it.
+        '404':
+          description: Feedback was not found.
