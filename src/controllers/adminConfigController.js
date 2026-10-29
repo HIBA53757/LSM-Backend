@@ -4,7 +4,7 @@ import { ValidationError } from "../utils/errors.js";
 
 
 const defaultConfig = {
-    emailsEnabled: true,
+    emailsEnabled: false,
     emailDriver: "log",
     inactiveDays: 7,
     inactiveReminderFrequency: "0 9 * * *",
