@@ -42,7 +42,6 @@ export const enrollCourse = async (req, res, next) => {
       console.log("[course title:", course.title);
       if (learner) {
         await sendCourseEnrolledEmail(learner, course)
-         console.log(" email service result:", result);
       }
     }
     catch (emailError) {
