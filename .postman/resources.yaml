@@ -1,10 +1,14 @@
 workspace:
   id: d4f83fd2-bcf6-42d2-8c25-61535b42a269
+
 localResources:
   collections:
     - ../LMS API HIBA
   specs:
     - ../postman/specs/test2/test2.json
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
 cloudResources:
   collections:
     ../LMS API HIBA: 6c7ae0f0-1ce5-4069-8346-2129f807f03f
