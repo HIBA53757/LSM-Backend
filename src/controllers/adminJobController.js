@@ -1,6 +1,7 @@
 import { runJob } from "../jobs/jobRunner.js";
 import { inactiveReminder } from "../jobs/inactiveReminder.js";
 import { ValidationError } from "../utils/errors.js";
+import JobRun from "../models/jobRun.js";
 
 const availableJobs = {
   inactiveReminder,
@@ -27,6 +28,21 @@ export async function runJobManually(req, res, next) {
         jobName: name,
         result,
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+export async function getJobRuns(req, res, next) {
+  try {
+    const jobRuns = await JobRun.find()
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    return res.status(200).json({
+      success: true,
+      count: jobRuns.length,
+      data: jobRuns,
     });
   } catch (error) {
     next(error);

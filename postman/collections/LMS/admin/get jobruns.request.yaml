@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{URL}}/api/admin/jobs/runs"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: ""
+order: 4000
