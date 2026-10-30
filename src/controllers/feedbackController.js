@@ -2,6 +2,7 @@ import Course from "../models/course.js";
 import Feedback from "../models/Feedback.js";
 import Progress from "../models/progress.js";
 import User from "../models/User.js";
+import { ForbiddenError, NotFoundError } from "../utils/errors.js";
 
 export async function createFeedback(req, res, next) {
     try {
@@ -14,27 +15,19 @@ export async function createFeedback(req, res, next) {
             role: 'learner'
         })
         if (!getLearner) {
-            return res.status(404).json({
-                message: "Learner not found",
-            })
+            throw new NotFoundError("Learner not found");
         }
         const getCourse = await Course.findById(course)
 
         if (!getCourse) {
-            return res.status(404).json({
-                message: "Course not found",
-            })
+            throw new NotFoundError("Course not found");
         }
 
         const isOwner = getCourse.trainer.toString() === trainer.toString();
         const isAdmin = req.user.role === "admin";
 
-        // console.log(, isAdmin , isOwner)
-
         if (!isAdmin && !isOwner) {
-            return res.status(403).json({
-                message: "You are not allowed to create feedback for this course"
-            });
+            throw new ForbiddenError("You are not allowed to create feedback for this course");
         }
 
         const getProgress = await Progress.findOne({
@@ -44,9 +37,7 @@ export async function createFeedback(req, res, next) {
         });
 
         if (!getProgress) {
-            return res.status(404).json({
-                message: "Progress not found ",
-            })
+            throw new NotFoundError("Progress not found");
         }
 
         const feedback = await Feedback.create({
@@ -108,18 +99,14 @@ export async function updateFeedback(req, res, next) {
         const feedback = await Feedback.findById(id);
 
         if (!feedback) {
-            return res.status(404).json({
-                message: "Feedback not found"
-            });
+            throw new NotFoundError("Feedback not found");
         }
 
         const isOwner = feedback.trainer.toString() === req.user.id.toString();
         const isAdmin = req.user.role === "admin";
 
         if (!isAdmin && !isOwner) {
-            return res.status(403).json({
-                message: "You are not allowed to modify this feedback"
-            });
+            throw new ForbiddenError("You are not allowed to modify this feedback");
         }
 
         const updatedFeedback = await Feedback.findByIdAndUpdate(
@@ -145,9 +132,7 @@ export async function deleteFeedback(req, res, next) {
         const feedback = await Feedback.findById(id);
 
         if (!feedback) {
-            return res.status(404).json({
-                message: "Feedback not found"
-            });
+            throw new NotFoundError("Feedback not found");
         }
 
         const isOwner =
@@ -155,9 +140,7 @@ export async function deleteFeedback(req, res, next) {
         const isAdmin = req.user.role === "admin";
 
         if (!isAdmin && !isOwner) {
-            return res.status(403).json({
-                message: "You are not allowed to delete this feedback"
-            });
+            throw new ForbiddenError("You are not allowed to delete this feedback");
         }
 
         await Feedback.findByIdAndDelete(id);

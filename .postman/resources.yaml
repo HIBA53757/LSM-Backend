@@ -1,13 +1,19 @@
-# Use this workspace to collaborate
 workspace:
-  id: d4f83fd2-bcf6-42d2-8c25-61535b42a269
+  id: 55617d07-b85e-4dc1-8dbd-c37bfe2e705e
 
 localResources:
   collections:
     - ../LMS API HIBA
+  specs:
+    - ../postman/specs/test2/test2.json
+    - ../C:/Users/pc/Desktop/LSM-Backend/postman/specs/test2/test2.json
 
 # Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
 
 cloudResources:
   collections:
     ../LMS API HIBA: 6c7ae0f0-1ce5-4069-8346-2129f807f03f
+    ../postman/collections/LMS API HIBA Copy: 738ef8a1-d784-48fd-ab8f-098a89fdb34b
+resourceNameMappings:
+  specs:
+    - ../postman/specs/test2/test2.json: test2

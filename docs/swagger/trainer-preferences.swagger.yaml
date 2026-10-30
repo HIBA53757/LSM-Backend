@@ -1,0 +1,151 @@
+tags:
+  - name: Trainer Preferences
+    description: Manage trainer notification preferences for selected courses
+
+paths:
+  /api/preferences:
+    post:
+      summary: Create trainer preferences
+      tags: [Trainer Preferences]
+      description: Creates the authenticated trainer's preferences. Each selected course must belong to that trainer, and only one preferences record can exist per trainer.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              subscribed: true
+              courses:
+                - 672a1b2c3d4e5f6789012345
+              frequency: weekly
+      responses:
+        '201':
+          description: Preferences created.
+          content:
+            application/json:
+              example:
+                message: Preferences created successfully.
+                preferences:
+                  _id: 672a1b2c3d4e5f6789012356
+                  trainer: 672a1b2c3d4e5f6789012348
+                  subscribed: true
+                  courses:
+                    - 672a1b2c3d4e5f6789012345
+                  frequency: weekly
+        '400':
+          description: Request body failed validation.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers can create preferences, and selected courses must belong to the trainer.
+        '404':
+          description: One of the selected courses was not found.
+        '409':
+          description: Trainer preferences already exist.
+
+  /api/preferences/{id}:
+    get:
+      summary: Get trainer preferences
+      tags: [Trainer Preferences]
+      description: Returns the authenticated trainer's preferences, with selected courses populated with title and status.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012356
+      responses:
+        '200':
+          description: Preferences and selected course details.
+          content:
+            application/json:
+              example:
+                preferences:
+                  _id: 672a1b2c3d4e5f6789012356
+                  trainer: 672a1b2c3d4e5f6789012348
+                  subscribed: true
+                  courses:
+                    - _id: 672a1b2c3d4e5f6789012345
+                      title: JavaScript Fundamentals
+                      status: published
+                  frequency: weekly
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers can access preferences.
+        '404':
+          description: Preferences were not found for the authenticated trainer.
+
+    patch:
+      summary: Update trainer preferences
+      tags: [Trainer Preferences]
+      description: Updates the authenticated trainer's preferences. If courses are included, each course must belong to that trainer. Fields are optional.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012356
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              subscribed: false
+              frequency: monthly
+      responses:
+        '200':
+          description: Preferences updated.
+          content:
+            application/json:
+              example:
+                message: Preferences updated successfully.
+                preferences:
+                  _id: 672a1b2c3d4e5f6789012356
+                  trainer: 672a1b2c3d4e5f6789012348
+                  subscribed: false
+                  courses:
+                    - 672a1b2c3d4e5f6789012345
+                  frequency: monthly
+        '400':
+          description: Request body failed validation.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers can update preferences, and selected courses must belong to the trainer.
+        '404':
+          description: Preferences or one of the selected courses was not found.
+
+    delete:
+      summary: Delete trainer preferences
+      tags: [Trainer Preferences]
+      description: Deletes the authenticated trainer's preferences.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012356
+      responses:
+        '200':
+          description: Preferences deleted.
+          content:
+            application/json:
+              example:
+                message: Preferences deleted successfully.
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers can delete preferences.
+        '404':
+          description: Preferences were not found for the authenticated trainer.

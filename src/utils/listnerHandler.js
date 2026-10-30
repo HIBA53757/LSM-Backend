@@ -1,5 +1,7 @@
 import os from "os"
-import { config } from "dotenv"
+import dotenv from "dotenv";
+
+dotenv.config()
 
 const backendHost = process.env.HOST
 

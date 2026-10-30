@@ -1,0 +1,8 @@
+$kind: http-request
+url: http://localhost:3000/api/admin/jobs/inactiveReminder/run
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: ""
+order: 3000
