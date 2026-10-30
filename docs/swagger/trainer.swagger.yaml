@@ -1,0 +1,97 @@
+tags:
+  - name: Trainer
+    description: Trainer courses, enrolled learners, and course progress statistics
+
+paths:
+  /api/trainer/Courses:
+    get:
+      summary: Get courses for the current trainer
+      tags: [Trainer]
+      description: Trainers receive their own courses; admins can retrieve courses across all trainers.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Courses and total count.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  count: 1
+                  courses:
+                    - _id: 672a1b2c3d4e5f6789012345
+                      title: JavaScript Fundamentals
+                      description: Learn JavaScript basics.
+                      level: beginner
+                      category: Programming
+                      status: published
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can access this endpoint.
+
+  /api/trainer/courses/{courseId}/learners:
+    get:
+      summary: Get learners enrolled in a course
+      tags: [Trainer]
+      description: Trainers can view active and completed enrollments for their own courses; admins can view enrollments for any course.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: string
+          example: 672a1b2c3d4e5f6789012345
+      responses:
+        '200':
+          description: Learner enrollments and total count, newest enrollment first.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  count: 1
+                  learners:
+                    - _id: 672a1b2c3d4e5f6789012350
+                      learner:
+                        _id: 672a1b2c3d4e5f6789012349
+                        name: Samira Learner
+                        email: samira@example.com
+                      course: 672a1b2c3d4e5f6789012345
+                      status: active
+                      enrolledAt: '2026-10-28T12:00:00.000Z'
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers and admins can access this endpoint; trainers must own the course.
+        '404':
+          description: Course was not found.
+
+  /api/trainer/statistics:
+    get:
+      summary: Get course and learner progress statistics
+      tags: [Trainer]
+      description: Returns course count, enrolled learner count, and average progress for each course belonging to the authenticated trainer. Average progress is calculated from learners with a progress percentage greater than zero.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Trainer course statistics, sorted by course title.
+          content:
+            application/json:
+              example:
+                success: true
+                data:
+                  coursesCount: 1
+                  courses:
+                    - courseId: 672a1b2c3d4e5f6789012345
+                      courseTitle: JavaScript Fundamentals
+                      enrolledLearnersCount: 12
+                      averageProgress: 45
+        '401':
+          description: Missing, invalid, or expired login token.
+        '403':
+          description: Only trainers can access this endpoint.
