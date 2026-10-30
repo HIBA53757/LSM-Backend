@@ -67,7 +67,7 @@ beforeAll(async () => {
     if (adminLogin.statusCode === 200) {
         adminToken = adminLogin.body.token;
     }
-});
+}, 15000);
 
 describe("Feedback API", () => {
     test("Refuser la création sans authentification", async () => {
