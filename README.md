@@ -1,15 +1,16 @@
 # LMS Backend
 
-REST API for a Learning Management System built with Node.js, Express, MongoDB, and Mongoose. It supports learner enrollment and sequential course progression, course content management, quizzes, quiz attempts, trainer preferences, and feedback.
+REST API for a Learning Management System built with Node.js, Express, MongoDB, and Mongoose. It supports learner accounts, course enrollment and progression, learning resources, quizzes and quiz attempts, trainer statistics and preferences, feedback, configurable email delivery, and an administrator endpoint for manually running the inactive learner reminder job.
 
 ## Tech stack
 
-- Node.js (ES modules)
+- Node.js with ES modules
 - Express 5
 - MongoDB and Mongoose
-- JWT authentication and role-based access
-- Jest and Supertest for API tests
-- Docker Compose for running the API and MongoDB
+- JWT bearer authentication with learner, trainer, and admin roles
+- Jest and Supertest
+- Docker Compose
+- Swagger UI at `/api-docs`
 
 ## Requirements
 
@@ -18,14 +19,18 @@ REST API for a Learning Management System built with Node.js, Express, MongoDB, 
 
 ## Local setup
 
-Install dependencies and create your local environment file:
+Install the dependencies and create a local environment file:
 
 ```bash
 npm install
 cp .env.example .env
 ```
 
-Set `MONGO_URI` and `JWT_SECRET` in `.env`. The supplied example uses a local MongoDB instance at `mongodb://localhost:27017/lms`.
+Set at least `MONGO_URI` and `JWT_SECRET` in `.env`. The example database URL is:
+
+```dotenv
+MONGO_URI=mongodb://localhost:27017/lms
+```
 
 Start the API in development mode:
 
@@ -39,18 +44,59 @@ Or start it normally:
 npm start
 ```
 
-The default API address is `http://localhost:3000`. The server binds to the configured `HOST` and `PORT` and logs the listener addresses it detects.
+The default local API URL is `http://localhost:3000`. The server uses the `HOST` and `PORT` values from `.env`.
 
-## Docker setup
+## Demo seed and accounts
+
+The seed script needs a password for each demo role. Add private values to `.env` before running it:
+
+```dotenv
+SEED_ADMIN_PASSWORD=<private-admin-password>
+SEED_TRAINER_PASSWORD=<private-trainer-password>
+SEED_LEARNER_PASSWORD=<private-learner-password>
+```
+
+Run the seed:
+
+```bash
+npm run db:seed
+```
+
+The script connects to the database configured by `MONGO_URI` and creates or updates these accounts:
+
+| Role | Demo email | Password variable |
+| --- | --- | --- |
+| Admin | `admin.demo@example.test` | `SEED_ADMIN_PASSWORD` |
+| Trainer | `trainer.one@example.test` | `SEED_TRAINER_PASSWORD` |
+| Trainer | `trainer.two@example.test` | `SEED_TRAINER_PASSWORD` |
+| Learner | `learner.one@example.test` | `SEED_LEARNER_PASSWORD` |
+| Learner | `learner.two@example.test` | `SEED_LEARNER_PASSWORD` |
+
+The seed also creates demo learning data. Re-running it resets the demo account passwords and replaces seed-owned demo courses and their related data. Run it only against a development database, never production.
+
+Registration creates learner accounts only. To sign in as a demo account, use `POST /api/auth/login` with the email and password configured above.
+
+## Docker Compose
 
 Create the Docker environment file and start the services:
 
 ```bash
 cp .docker.env.example .docker.env
+```
+
+Set private values for `JWT_SECRET` and the three `SEED_*_PASSWORD` variables in `.docker.env`, then start Docker:
+
+```bash
 docker compose up --build -d
 ```
 
-The Docker environment example connects the API to the Compose MongoDB service at `mongodb://mongodb:27017/lms`. The API port and bind host are configured by `HOST` and `PORT` in `.docker.env`.
+The supplied Docker configuration connects the API to the Compose MongoDB service at `mongodb://mongodb:27017/lms`. The default API URL is `http://localhost:3001`.
+
+Seed the Docker database from inside the API container:
+
+```bash
+docker compose exec api npm run db:seed
+```
 
 Stop the services with:
 
@@ -58,39 +104,47 @@ Stop the services with:
 docker compose down
 ```
 
-MongoDB data is stored in the `mongodb_data` Docker volume.
+MongoDB data is kept in the `mongodb_data` volume. To also remove that database volume, Docker Compose supports `docker compose down -v`; this deletes the persisted database data.
 
 ## Environment variables
 
-| Variable | Purpose | Example |
+| Variable | Purpose | Example or default |
 | --- | --- | --- |
 | `HOST` | Address the API binds to | `0.0.0.0` |
-| `PORT` | API port | `3000` locally; `.docker.env.example` uses `3001` |
-| `MONGO_URI` | MongoDB connection string | `mongodb://localhost:27017/lms` |
-| `JWT_SECRET` | Secret used to sign and verify tokens | Set a private value |
-| `EMAIL_DRIVER` | Email delivery mode | `log` |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | SMTP settings when using SMTP email delivery | See `.env.example` |
-| `FRONTEND_URL` | Frontend base URL used in password reset links | Defaults to `http://localhost:5173` |
+| `PORT` | API port | `3000` locally; `3001` in `.docker.env.example` |
+| `MONGO_URI` | MongoDB connection string | `mongodb://localhost:27017/lms` locally; `mongodb://mongodb:27017/lms` in Docker |
+| `JWT_SECRET` | Secret used to sign and verify JWTs | Set a private value |
+| `FRONTEND_URL` | Base URL used to build password reset links | Defaults to `http://localhost:5173` |
+| `EMAIL_DRIVER` | Email delivery mode used by the email service | `log` by default; `sandbox` uses SMTP |
+| `SMTP_HOST` | SMTP server hostname | See `.env.example` |
+| `SMTP_PORT` | SMTP server port | `2525` by default in the email service |
+| `SMTP_USER` | SMTP account username | Set for SMTP delivery |
+| `SMTP_PASS` | SMTP account password | Set for SMTP delivery |
+| `EMAIL_FROM` | Sender address used by the email service | Set for SMTP delivery |
+| `SEED_ADMIN_PASSWORD` | Demo admin password | Required by the seed |
+| `SEED_TRAINER_PASSWORD` | Shared password for both demo trainers | Required by the seed |
+| `SEED_LEARNER_PASSWORD` | Shared password for both demo learners | Required by the seed |
 
-Use a private `JWT_SECRET` and real SMTP credentials only in your local environment; do not commit secrets.
+Keep `.env`, `.docker.env`, JWT secrets, SMTP credentials, and demo passwords out of version control. The email service reads `EMAIL_FROM`; check the example environment files for the sender variable name before configuring SMTP.
 
-## React integration contract
+## Authentication and React integration contract
 
-The frontend should treat the API response envelope and the role attached to the JWT as the source of truth. The API does not issue a token during registration; call login after registration. Send the login token on protected requests as `Authorization: Bearer <token>` and keep it out of URLs and logs.
+All API endpoints are mounted under `/api`. Successful responses generally use a JSON envelope with `success`, `message` where provided, and `data`. Protected routes require:
 
-### Base URL and accounts by environment
+```http
+Authorization: Bearer <token>
+```
 
-| Environment | API base URL | Database / account setup |
-| --- | --- | --- |
-| Local development | `http://localhost:3000` (or the configured `PORT`) | Use the local `.env` database. `POST /api/auth/register` creates a learner account. To exercise trainer/admin screens, first register a development account, then change its `role` in the local MongoDB `users` collection to `trainer` or `admin`. |
-| Docker Compose | `http://localhost:3001` with the supplied `.docker.env.example` (or the configured host port) | Register through the mapped API URL. For trainer/admin demo accounts, change the role of a registered account in the Compose MongoDB database. Do not use production credentials or data for demos. |
-| Automated tests | Set `MONGO_URI` to a dedicated test database before running `npm test`. | Most integration tests create their own fixtures. `tests/feedback.test.js` also reads `TEST_ADMIN_EMAIL` and `TEST_ADMIN_PASSWORD` and expects that admin account to exist in the database it connects to. `MONGO_URI_TEST` is currently used by `tests/adminConfig.test.js`; it does not configure the whole suite. |
+Use the role returned by login as the source of truth for role-based screens. Registration does not return a token; call login after registration.
 
-Registration only creates learner accounts. The current API has no public endpoint for creating trainer/admin accounts and the seed script does not create demo users, so those accounts must be provisioned separately in non-production data. Keep environment-specific passwords and JWT secrets outside the repository.
+### Register and log in
 
-### Authentication
+Register a learner:
 
-Register a learner with `POST /api/auth/register`:
+```http
+POST /api/auth/register
+Content-Type: application/json
+```
 
 ```json
 {
@@ -100,12 +154,27 @@ Register a learner with `POST /api/auth/register`:
 }
 ```
 
-The response is `201 Created` and contains the created user, but no token:
+A successful registration returns `201 Created`, user details, and no token. Then log in:
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+```
+
+```json
+{
+  "email": "samira@example.com",
+  "password": "<password>"
+}
+```
+
+A successful login returns a bearer token and user details:
 
 ```json
 {
   "success": true,
-  "message": "User registered successfully",
+  "message": "Logged in successfully",
+  "token": "<jwt>",
   "data": {
     "user": {
       "name": "Samira Learner",
@@ -117,28 +186,54 @@ The response is `201 Created` and contains the created user, but no token:
 }
 ```
 
-Then call `POST /api/auth/login` with the same email and password. Save `token` from the response and send it as a bearer token for protected calls. The login response user has `name`, `id`, `email`, and `role` fields.
-
-```http
-Authorization: Bearer <token>
-```
+Send the token in the `Authorization` header for protected requests. Do not put tokens in URLs or logs.
 
 ### Course catalog and enrollment
 
-The catalog is public. `GET /api/courses` returns `{ "success": true, "data": { "courses": [...] } }`; each course includes its published course fields such as `_id`, `title`, `description`, `objectives`, `level`, `category`, `estimatedDuration`, `status`, `publishedAt`, and `trainer`. Optional query parameters are `category`, `level`, `keyword`, and `sort` (`createdAt`, `-createdAt`, `publishedAt`, or `-publishedAt`).
+The course catalog is public:
 
-Use `GET /api/courses/:courseId` for one published course and `GET /api/courses/:courseId/modules` for its modules. An authenticated learner enrolls with `POST /api/enrollments/courses/:courseId/enroll`; the response puts the created enrollment at `data.enrollment`. `GET /api/enrollments/me` returns the learner's enrollments at `data.enrollments`.
+```http
+GET /api/courses
+GET /api/courses/:courseId
+GET /api/courses/:courseId/modules
+```
+
+The listing accepts `category`, `level`, `keyword`, and `sort` query parameters. Supported sort values are `createdAt`, `-createdAt`, `publishedAt`, and `-publishedAt`. Example:
+
+```text
+GET /api/courses?category=JavaScript&level=beginner&sort=-createdAt
+```
+
+The course listing response places courses at `data.courses`. A course includes published course fields such as its ID, title, description, objectives, level, category, estimated duration, status, publication date, and trainer.
+
+A learner enrolls in a course with:
+
+```http
+POST /api/enrollments/courses/:courseId/enroll
+```
+
+The response contains `data.enrollment`. Retrieve the signed-in learner’s enrollments with:
+
+```http
+GET /api/enrollments/me
+```
+
+Cancel an enrollment with:
+
+```http
+PATCH /api/enrollments/:id/cancel
+```
 
 ### Learner progression
 
-Progress is learner-specific and requires an active enrollment. The current progression routes are:
+Progression routes are for learners with an active enrollment in the relevant course:
 
-1. `GET /api/progress/resources/:resourceId/view` retrieves an accessible resource and creates the learner's initial progress record if needed. Its response is `{ "success": true, "data": { "resource": ... } }`.
-2. After the learner views it, `POST /api/progress/resources/:resourceId/complete` records it in progress. The response includes `data.progress`.
-3. `POST /api/progress/modules/:moduleId/complete` completes the module after its resources, any required quiz, and the previous module satisfy the backend rules.
-4. `GET /api/progress/courses/:courseId` returns the saved course progress.
+1. `GET /api/progress/resources/:resourceId/view` retrieves an accessible resource and creates an initial progress record when needed.
+2. `POST /api/progress/resources/:resourceId/complete` records the resource as completed.
+3. `POST /api/progress/modules/:moduleId/complete` completes a module when the required resources, quiz, and previous module meet the backend rules.
+4. `GET /api/progress/courses/:courseId` returns the learner’s saved course progress.
 
-The course progress response has this shape:
+A course progression response has this shape:
 
 ```json
 {
@@ -165,11 +260,11 @@ The course progress response has this shape:
 }
 ```
 
-Module `status` values are `accessible`, `locked`, `in progress`, and `done`. The progress endpoint returns `404` until a progress record has been created through the resource view flow.
+Module status values are `accessible`, `locked`, `in progress`, and `done`. The course progress endpoint can return `404` before the learner has created a progress record through the resource view flow.
 
 ### Trainer statistics
 
-`GET /api/trainer/statistics` requires a trainer bearer token. It returns one aggregate per course owned by that trainer:
+`GET /api/trainer/statistics` requires a trainer bearer token and returns only courses owned by the authenticated trainer.
 
 ```json
 {
@@ -188,41 +283,30 @@ Module `status` values are `accessible`, `locked`, `in progress`, and `done`. Th
 }
 ```
 
-`enrolledLearnersCount` counts active and completed enrollments. `averageProgress` is the rounded average percentage for enrolled learners who have started progress; it is `0` when there are no started progress records. `coursesCount` is the number of trainer-owned courses returned by the aggregation.
-
-### Error responses
-
-Errors handled by the shared middleware use this response shape; React can display `message` and use the HTTP status for handling authentication, access, validation, and missing-resource cases:
-
-```json
-{
-  "success": false,
-  "message": "Previous module must be completed first"
-}
-```
+`enrolledLearnersCount` counts active and completed enrollments. `averageProgress` is the rounded average progress percentage for enrolled learners with progress greater than zero; it is `0` when there are no such progress records. `coursesCount` is the number of trainer-owned courses in the response.
 
 ## API overview
 
-All API routes are mounted under `/api`. Protected routes require a bearer token and enforce the role shown in the route definitions.
+Protected endpoints require a bearer token and enforce the listed role and ownership checks.
 
-### Health and account
+### Health, authentication, and profile
 
 | Method | Endpoint | Access |
 | --- | --- | --- |
-| `GET` | `/` | Health response |
-| `POST` | `/api/auth/register` | Public |
+| `GET` | `/` | Public health response |
+| `POST` | `/api/auth/register` | Public; creates a learner |
 | `POST` | `/api/auth/login` | Public |
 | `POST` | `/api/auth/forgot-password` | Public |
 | `POST` | `/api/auth/reset-password` | Public |
 | `GET` | `/api/profiles/me` | Authenticated user |
 
-### Courses and content
+### Courses, modules, and resources
 
 | Method | Endpoint | Access |
 | --- | --- | --- |
-| `GET` | `/api/courses` | Public course listing; supports query filters/search/sorting |
-| `GET` | `/api/courses/:id` | Public course details |
-| `GET` | `/api/courses/:courseId/modules` | Public course modules |
+| `GET` | `/api/courses` | Public; supports filters and sorting |
+| `GET` | `/api/courses/:id` | Public |
+| `GET` | `/api/courses/:courseId/modules` | Public |
 | `POST` | `/api/courses` | Trainer or admin |
 | `PATCH` | `/api/courses/:id` | Course owner or admin |
 | `PATCH` | `/api/courses/:id/publish` | Course owner or admin |
@@ -233,17 +317,11 @@ All API routes are mounted under `/api`. Protected routes require a bearer token
 | `PUT` | `/api/modules/:moduleId` | Module owner or admin |
 | `PATCH` | `/api/modules/:moduleId/publish` | Module owner or admin |
 | `PATCH` | `/api/modules/:moduleId/unpublish` | Module owner or admin |
-| `POST` | `/api/resources/modules/:moduleId` | Trainer or admin who owns the module; accepts an optional uploaded `file` |
+| `POST` | `/api/resources/modules/:moduleId` | Trainer or admin who owns the module; optional `file` upload |
 | `PUT` | `/api/resources/:resourceId` | Resource owner or admin |
 | `PATCH` | `/api/resources/:resourceId/published` | Resource owner or admin |
 
-Course listing filters include `category`, `level`, `keyword`, and `sort`. For example:
-
-```text
-GET /api/courses?category=JavaScript&level=beginner&sort=-createdAt
-```
-
-### Enrollment and learner progression
+### Enrollment and progression
 
 | Method | Endpoint | Access |
 | --- | --- | --- |
@@ -251,29 +329,27 @@ GET /api/courses?category=JavaScript&level=beginner&sort=-createdAt
 | `POST` | `/api/enrollments/courses/:courseId/enroll` | Learner |
 | `PATCH` | `/api/enrollments/:id/cancel` | Learner |
 | `GET` | `/api/progress/courses/:courseId` | Enrolled learner |
-| `GET` | `/api/progress/resources/:resourceId/view` | Enrolled learner; retrieves a resource subject to progression rules |
-| `POST` | `/api/progress/resources/:resourceId/complete` | Enrolled learner; records a resource as viewed/completed |
-| `POST` | `/api/progress/modules/:moduleId/complete` | Enrolled learner; completes a module subject to progression rules |
+| `GET` | `/api/progress/resources/:resourceId/view` | Enrolled learner; subject to progression rules |
+| `POST` | `/api/progress/resources/:resourceId/complete` | Enrolled learner |
+| `POST` | `/api/progress/modules/:moduleId/complete` | Enrolled learner; subject to progression rules |
 
-Progress endpoints resolve the course/module/resource from the supplied identifier and check the learner's active enrollment. Sequential access and completion rules are enforced by the backend.
+### Quizzes and attempts
 
-### Quizzes and quiz attempts
+The learner quiz view does not include correct answers. Quiz submissions are scored by the backend and saved as quiz attempts.
 
 | Method | Endpoint | Access |
 | --- | --- | --- |
-| `GET` | `/api/quizzes/:quizId/view` | Learner enrolled in the quiz's course |
-| `POST` | `/api/quizzes/submit` | Learner enrolled in the quiz's course |
-| `GET` | `/api/quizzes/modules/:moduleId` | Trainer or admin; lists quizzes in a module |
+| `GET` | `/api/quizzes/:quizId/view` | Enrolled learner |
+| `POST` | `/api/quizzes/submit` | Enrolled learner |
+| `GET` | `/api/quizzes/modules/:moduleId` | Trainer or admin who owns the module |
 | `GET` | `/api/quizzes/:quizId` | Quiz owner or admin |
 | `POST` | `/api/quizzes` | Trainer or admin who owns the module |
 | `PATCH` | `/api/quizzes/:quizId` | Quiz owner or admin |
 | `DELETE` | `/api/quizzes/:quizId` | Quiz owner or admin |
 | `GET` | `/api/quiz/attempts/me` | Learner |
 | `GET` | `/api/quiz/attempts/me/courses/:courseId` | Learner enrolled in the course |
-| `GET` | `/api/quiz/attempts` | Trainer or admin; lists attempts for their courses (admin: all courses) |
+| `GET` | `/api/quiz/attempts` | Trainer or admin; trainer sees their courses |
 | `GET` | `/api/quiz/attempts/courses/:courseId` | Course owner or admin |
-
-The learner quiz view omits correct answers. Submissions are scored and saved as quiz attempts.
 
 ### Trainer, feedback, and preferences
 
@@ -281,65 +357,5 @@ The learner quiz view omits correct answers. Submissions are scored and saved as
 | --- | --- | --- |
 | `GET` | `/api/trainer/Courses` | Trainer or admin |
 | `GET` | `/api/trainer/courses/:courseId/learners` | Course owner or admin |
-| `POST` | `/api/preferences` | Trainer |
-| `GET` | `/api/preferences` | Trainer |
-| `DELETE` | `/api/preferences` | Trainer |
-| `POST` | `/api/feedback` | Trainer or admin |
-| `PUT` | `/api/feedback/:id` | Trainer or admin |
-| `DELETE` | `/api/feedback/:id` | Trainer or admin |
-| `GET` | `/api/feedback/me` | Learner |
-| `GET` | `/api/feedback` | Admin |
-
-## Tests
-
-Run the Jest and Supertest suite with:
-
-```bash
-npm test
-```
-
-The tests cover authentication, courses, enrollment, trainer quiz management, learner quiz viewing/submission, and quiz attempt endpoints.
-
-## Project structure
-
-```text
-src/
-  config/        Database connection
-  controllers/   Request handlers
-  middlewares/   Authentication, authorization, ownership, validation, and errors
-  models/        Mongoose models
-  routes/        Feature route definitions
-  services/      Email services
-  templates/     Email templates
-  utils/         Shared helpers, errors, and listener reporting
-  validations/   Request schemas
- tests/          Jest and Supertest tests
- seed/           Database seed script
- docs/           Project diagrams and progression notes
-```
-
-## Contrat React
-
-### Statistiques du formateur
-
-**Endpoint :** `GET /api/trainer/statistics`  
-**Authentification :** token Bearer obligatoire. Réservé au rôle `trainer`.  
-**Résultat :** les statistiques portent uniquement sur les cours du formateur authentifié.
-
-**Réponse `200` :**
-
-```json
-{
-  "success": true,
-  "data": {
-    "coursesCount": 1,
-    "courses": [
-      {
-        "courseId": "64f000000000000000000001",
-        "courseTitle": "JavaScript",
-        "enrolledLearnersCount": 12,
-        "averageProgress": 48
-      }
-    ]
-  }
-}
+| `GET` | `/api/trainer/statistics` | Trainer |
+| `
