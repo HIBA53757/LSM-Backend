@@ -1,11 +1,12 @@
-
 import express from "express";
-import { runJobManually , getJobRuns } from "../controllers/adminJobController.js";
+
+import { runInactiveReminder,runTrainerSummary,getJobRuns,} from "../controllers/adminJobController.js";
 import { authenticate, authorize } from "../middlewares/Auth.js";
 
 const router = express.Router();
 
-router.post( "/:name/run", authenticate,authorize("admin"),runJobManually);
-router.get("/runs",authenticate,authorize("admin"),getJobRuns)
+router.post("/inactive-reminder/run",authenticate,authorize("admin"),runInactiveReminder);
+router.post("/trainer-summary/run",authenticate,authorize("trainer"),runTrainerSummary);
+router.get( "/runs",authenticate,authorize("admin"),getJobRuns);
 
 export default router;

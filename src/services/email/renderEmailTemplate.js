@@ -1,4 +1,3 @@
-
 import { readFile } from "node:fs/promises";
 
 const allowedTemplates = [
@@ -18,7 +17,11 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-export async function renderEmailTemplate(templateName, data = {}) {
+export async function renderEmailTemplate(
+  templateName,
+  data = {},
+  trustedHtml = []
+) {
   if (!allowedTemplates.includes(templateName)) {
     throw new Error(`Unknown email template: ${templateName}`);
   }
@@ -35,6 +38,10 @@ export async function renderEmailTemplate(templateName, data = {}) {
     (placeholder, key) => {
       if (!(key in data) || data[key] == null) {
         throw new Error(`Missing template variable: ${key}`);
+      }
+
+      if (trustedHtml.includes(key)) {
+        return String(data[key]);
       }
 
       return escapeHtml(data[key]);
