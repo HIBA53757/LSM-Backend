@@ -17,5 +17,14 @@ services:
       - .docker.env
     depends_on:
       - mongodb
+  seed:
+    build: . 
+    container_name: seed
+    command: ["npm", "run", "db:seed"]
+    restart: "no"
+    depends_on:
+      - api
+    env_file:
+      - .docker.env
 volumes:
   mongodb_data:
