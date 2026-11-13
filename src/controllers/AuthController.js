@@ -73,7 +73,7 @@ export async function login(req, res, next) {
       return next(new ValidationError("Email and password are required."));
     }
     // Find user
-    const user = await User.findOne({ email }).select('password');
+    const user = await User.findOne({ email }).select('+password');
 
     console.log(user)
 
